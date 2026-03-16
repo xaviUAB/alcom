@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Agencia Algorítmica</title>
+    <!-- Cargamos Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados y transiciones */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* * ESTRUCTURA DE CAPAS (Z-INDEX)
+         * 5: Marcas de agua (PASAJERA, NAVEGANTE, SOBERANA)
+         * 10: Centro de la brújula
+         * 15: Nodos negros (Puntos)
+         * 20: Etiquetas blancas (.compass-label)
+         * 30: Aguja (.compass-needle) -> Por encima de las blancas
+         * 40: Tooltips negros académicos (.tooltip) -> Por encima de la aguja
+         */
+
+        .compass-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            /* Degradado dividido en 6 sectores pastel y un brillo central superpuesto */
+            background: 
+                radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.3) 55%, rgba(255,255,255,0) 100%),
+                conic-gradient(
+                    from -30deg,
+                    #fee2e2 0deg 60deg,    /* 1. Rojo pastel (Sumisión) */
+                    #ffedd5 60deg 120deg,  /* 2. Naranja pastel (Aceptación) */
+                    #fef9c3 120deg 180deg, /* 3. Amarillo pastel (Exploración) */
+                    #ecfccb 180deg 240deg, /* 4. Verde amarillento pastel (Contraste) */
+                    #dcfce7 240deg 300deg, /* 5. Verde pastel (Valoración) */
+                    #d1fae5 300deg 360deg  /* 6. Esmeralda pastel (Elección autónoma) */
+                );
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .compass-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background-color: #0f172a;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            border: 3px solid #cbd5e1;
+        }
+
+        .compass-node {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #475569;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            border: 2px solid white;
+        }
+
+        .compass-needle {
+            position: absolute;
+            bottom: 50%;
+            left: calc(50% - 2px); 
+            width: 4px;
+            height: 45%;
+            background: linear-gradient(to top, #334155, #ef4444);
+            transform-origin: bottom center;
+            border-radius: 4px 4px 0 0;
+            transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: rotate(0deg);
+            z-index: 30; /* Pasa por encima de las etiquetas blancas (z:20) */
+            pointer-events: none; /* Evita que bloquee el hover de las etiquetas */
+        }
+
+        .compass-needle::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 12px solid #ef4444;
+        }
+
+        /* Marcas de agua interiores (centradas y aumentadas) */
+        .profile-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 1.25rem; 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.15;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .profile-pasajera { top: 35%; left: 65%; color: #ef4444; }
+        .profile-navegante { top: 65%; left: 65%; color: #10b981; }
+        .profile-soberana { top: 50%; left: 30%; color: #0f172a; }
+
+        /* Etiquetas blancas */
+        .compass-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            width: 120px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 20; /* Debajo de la aguja (z:30) */
+            cursor: help; 
+        }
+
+        /* Posiciones exactas (0º a 300º) */
+        .label-1, .node-1 { top: 0%; left: 50%; color: #e11d48; } 
+        .label-2, .node-2 { top: 25%; left: 93.3%; color: #be185d; } 
+        .label-3, .node-3 { top: 75%; left: 93.3%; color: #059669; } 
+        .label-4, .node-4 { top: 100%; left: 50%; color: #047857; } 
+        .label-5, .node-5 { top: 75%; left: 6.7%; color: #334155; } 
+        .label-6, .node-6 { top: 25%; left: 6.7%; color: #0f172a; } 
+
+        /* TOOLTIPS ACADÉMICOS NEGROS */
+        .tooltip {
+            position: absolute;
+            width: 240px;
+            background-color: #0f172a;
+            color: #f8fafc;
+            text-align: left;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1.4;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 40; /* Por encima de la aguja (z:30) y etiquetas blancas (z:20) */
+        }
+
+        /* Posicionamiento y flechas de cada Tooltip individual */
+        /* Tooltip 1 (Arriba -> se despliega hacia abajo) */
+        .tooltip-1 { top: 0%; left: 50%; transform: translate(-50%, 35px); }
+        .label-1:hover ~ .tooltip-1, .tooltip-1:hover { transform: translate(-50%, 30px); opacity: 1; visibility: visible; }
+        .tooltip-1::after { content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-bottom-color: #0f172a; }
+        .tooltip-1::before { content: ''; position: absolute; bottom: 100%; left: 0; right: 0; height: 40px; } /* Puente invisible para mantener el hover */
+
+        /* Tooltip 2 (Arriba Derecha -> se despliega hacia la izquierda) */
+        .tooltip-2 { top: 25%; left: 93.3%; transform: translate(calc(-100% - 65px), -50%); }
+        .label-2:hover ~ .tooltip-2, .tooltip-2:hover { transform: translate(calc(-100% - 60px), -50%); opacity: 1; visibility: visible; }
+        .tooltip-2::after { content: ''; position: absolute; top: 50%; left: 100%; transform: translateY(-50%); border: 6px solid transparent; border-left-color: #0f172a; }
+        .tooltip-2::before { content: ''; position: absolute; top: -20px; bottom: -20px; left: 100%; width: 70px; }
+
+        /* Tooltip 3 (Abajo Derecha -> se despliega hacia la izquierda) */
+        .tooltip-3 { top: 75%; left: 93.3%; transform: translate(calc(-100% - 65px), -50%); }
+        .label-3:hover ~ .tooltip-3, .tooltip-3:hover { transform: translate(calc(-100% - 60px), -50%); opacity: 1; visibility: visible; }
+        .tooltip-3::after { content: ''; position: absolute; top: 50%; left: 100%; transform: translateY(-50%); border: 6px solid transparent; border-left-color: #0f172a; }
+        .tooltip-3::before { content: ''; position: absolute; top: -20px; bottom: -20px; left: 100%; width: 70px; }
+
+        /* Tooltip 4 (Abajo -> se despliega hacia arriba) */
+        .tooltip-4 { top: 100%; left: 50%; transform: translate(-50%, calc(-100% - 35px)); }
+        .label-4:hover ~ .tooltip-4, .tooltip-4:hover { transform: translate(-50%, calc(-100% - 30px)); opacity: 1; visibility: visible; }
+        .tooltip-4::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #0f172a; }
+        .tooltip-4::before { content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 40px; }
+
+        /* Tooltip 5 (Abajo Izquierda -> se despliega hacia la derecha) */
+        .tooltip-5 { top: 75%; left: 6.7%; transform: translate(65px, -50%); }
+        .label-5:hover ~ .tooltip-5, .tooltip-5:hover { transform: translate(60px, -50%); opacity: 1; visibility: visible; }
+        .tooltip-5::after { content: ''; position: absolute; top: 50%; right: 100%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: #0f172a; }
+        .tooltip-5::before { content: ''; position: absolute; top: -20px; bottom: -20px; right: 100%; width: 70px; }
+
+        /* Tooltip 6 (Arriba Izquierda -> se despliega hacia la derecha) */
+        .tooltip-6 { top: 25%; left: 6.7%; transform: translate(65px, -50%); }
+        .label-6:hover ~ .tooltip-6, .tooltip-6:hover { transform: translate(60px, -50%); opacity: 1; visibility: visible; }
+        .tooltip-6::after { content: ''; position: absolute; top: 50%; right: 100%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: #0f172a; }
+        .tooltip-6::before { content: ''; position: absolute; top: -20px; bottom: -20px; right: 100%; width: 70px; }
+
+        @media (max-width: 640px) {
+            .compass-container { max-width: 280px; }
+            .compass-label { font-size: 0.65rem; width: 90px; }
+            .profile-label { font-size: 0.95rem; }
+            .tooltip { width: 210px; font-size: 0.7rem; }
+        }
+
+        .adventure-btn {
+            @apply flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-md transition-all text-slate-700 cursor-pointer;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col items-center py-8 px-4">
+
+    <!-- Envoltorio para mantener el footer al final de forma natural -->
+    <div class="w-full max-w-2xl flex flex-col flex-grow">
+        
+        <!-- Contenedor principal de la aplicación -->
+        <div id="app" class="w-full bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden relative flex-grow mb-8">
+            <!-- El contenido se renderizará dinámicamente aquí via JavaScript -->
+        </div>
+
+        <!-- Pie de página estático visible en todas las pantallas -->
+        <footer class="text-center text-xs text-slate-500 mt-auto pb-2">
+            <p class="font-bold text-slate-600 text-sm mb-1">Un desarrollo de Xavier Ribes para el proyecto ALCOM</p>
+            <p class="leading-relaxed max-w-lg mx-auto opacity-80">
+                Percepción y generación de conocimiento sobre los algoritmos de personalización en las plataformas digitales de comunicación (PID2023-148682OA-I00)
+            </p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Configuración de Cuestionarios y Tipos
+        
+        // 1. Preguntas exclusivas para Redes Sociales
+        const socialQuestions = [
+            {
+                text: "Al abrir {plataforma} sin un objetivo claro, ¿qué sueles hacer?",
+                options: [
+                    { text: "Ver lo primero que aparece en mi pantalla principal o feed.", value: 1 },
+                    { text: "Deslizar y dar 'me gusta' a lo que me atrae para que el algoritmo aprenda.", value: 2 },
+                    { text: "Usar el buscador o etiquetas (hashtags) para encontrar algo específico.", value: 3 },
+                    { text: "Ir directamente a perfiles o canales que mi comunidad me ha recomendado.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Cómo decides si una publicación o vídeo en {plataforma} vale la pena?",
+                options: [
+                    { text: "Dejo que se reproduzca; confío ciegamente en el algoritmo.", value: 1 },
+                    { text: "Valoro si se parece a otras cosas que ya he consumido en este espacio.", value: 2 },
+                    { text: "Salgo de la app para buscar más información en otras fuentes.", value: 4 },
+                    { text: "Analizo por qué me lo recomiendan y si existen sesgos comerciales o de viralidad.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Qué haces cuando el sistema de {plataforma} te muestra contenidos sesgados o que no te gustan?",
+                options: [
+                    { text: "Sigo consumiendo el contenido pasivamente y deslizo rápido.", value: 1 },
+                    { text: "Uso la opción de 'no me interesa' para tratar de educar al sistema.", value: 3 },
+                    { text: "Reflexiono sobre los sesgos de la plataforma y su impacto social.", value: 5 },
+                    { text: "Dejo de usar la aplicación y busco espacios informativos más diversos.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Hasta qué punto consideras que controlas lo que consumes en {plataforma}?",
+                options: [
+                    { text: "Nada, la plataforma decide el flujo y me resulta cómodo.", value: 1 },
+                    { text: "Algo, porque moldeo mi perfil mediante mis interacciones diarias.", value: 2 },
+                    { text: "Bastante, porque entro con propósitos claros de búsqueda.", value: 3 },
+                    { text: "Total, soy consciente de cuándo entrar y evito su sistema automatizado.", value: 6 }
+                ]
+            },
+            {
+                text: "Si quieres descubrir nuevas cuentas o tendencias en {plataforma}, ¿cómo lo haces?",
+                options: [
+                    { text: "Dejo que la sección de sugerencias o 'Para ti' me guíe.", value: 1 },
+                    { text: "Reviso listas, canales recomendados o etiquetas de mis gustos.", value: 3 },
+                    { text: "Pregunto a amistades o consulto medios fuera de la red.", value: 4 },
+                    { text: "Investigo de forma independiente, fuera de las tendencias dominantes.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Qué opinión te merecen los contenidos 'Virales' o 'Tendencias' de {plataforma}?",
+                options: [
+                    { text: "Son mi guía principal para estar al día de lo que ocurre.", value: 1 },
+                    { text: "Los miro si encajan casualmente con lo que suelo ver.", value: 2 },
+                    { text: "Los tomo como referencia inicial, pero formo mi propia opinión fuera.", value: 4 },
+                    { text: "Los evito porque suelen ser fruto de intereses promocionales.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Con qué frecuencia buscas contenido que rompa con tu 'burbuja' o preferencias habituales en {plataforma}?",
+                options: [
+                    { text: "Nunca, sigo el flujo constante que me da la plataforma.", value: 1 },
+                    { text: "Raramente, me resulta más cómodo mi entorno familiar de intereses.", value: 2 },
+                    { text: "Frecuentemente, busco de forma activa temáticas distintas usando el buscador.", value: 3 },
+                    { text: "Siempre, hago búsquedas sistemáticas para mantener una visión plural.", value: 6 }
+                ]
+            },
+            {
+                text: "Al interactuar (guardar, compartir, comentar) en {plataforma}, ¿cuál es tu motivación principal?",
+                options: [
+                    { text: "Lo hago por inercia, sin pensarlo mucho.", value: 1 },
+                    { text: "Para que la interfaz me siga mostrando publicaciones similares.", value: 2 },
+                    { text: "Intento no interactuar demasiado para proteger mis datos personales.", value: 5 },
+                    { text: "Para dar apoyo genuino a quienes crean contenido, sin importar el algoritmo.", value: 6 }
+                ]
+            },
+            {
+                text: "Si pasas demasiado tiempo haciendo 'scroll' infinito en {plataforma}, ¿cómo reaccionas?",
+                options: [
+                    { text: "Sigo mirando, me cuesta salir del piloto automático.", value: 1 },
+                    { text: "Intento centrarme y buscar alguna temática más concreta y útil.", value: 3 },
+                    { text: "Salgo para contrastar en internet algo interesante que he visto.", value: 4 },
+                    { text: "Me desconecto intencionadamente para realizar actividades fuera de las pantallas.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Cómo describirías tu relación ideal con {plataforma}?",
+                options: [
+                    { text: "Que me ofrezca entretenimiento constante sin requerir esfuerzo por mi parte.", value: 1 },
+                    { text: "Que me permita adaptar mi espacio mediante mis clics y 'me gusta' diarios.", value: 2 },
+                    { text: "Que sea una herramienta de búsqueda donde yo tomo la iniciativa.", value: 3 },
+                    { text: "Que sea un recurso puntual, manteniendo yo el control soberano de mi tiempo.", value: 6 }
+                ]
+            }
+        ];
+
+        // 2. Preguntas exclusivas para Plataformas de Streaming
+        const streamingQuestions = [
+            {
+                text: "Al abrir {plataforma} sin saber qué elegir, ¿qué sueles hacer?",
+                options: [
+                    { text: "Poner la primera recomendación destacada o de reproducción automática.", value: 1 },
+                    { text: "Navegar por las filas de 'Porque viste...' o categorías similares.", value: 2 },
+                    { text: "Usar el buscador para encontrar un título, artista o género concreto.", value: 3 },
+                    { text: "Buscar una obra que mis amistades o la crítica me han recomendado previamente.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Cómo decides si un contenido sugerido por {plataforma} merece tu tiempo?",
+                options: [
+                    { text: "Empiezo a verlo o escucharlo directamente sin dudar.", value: 1 },
+                    { text: "Me fijo en el porcentaje de afinidad o si se parece a mi historial.", value: 2 },
+                    { text: "Busco críticas o puntuaciones en webs externas (ej. FilmAffinity, IMDB).", value: 4 },
+                    { text: "Me pregunto si es una promoción de la propia plataforma antes de elegir.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Qué haces si {plataforma} te insiste con obras muy comerciales o que no encajan contigo?",
+                options: [
+                    { text: "Las acabo consumiendo por inercia o comodidad.", value: 1 },
+                    { text: "Uso los botones de valoración o borro el historial para intentar educarla.", value: 3 },
+                    { text: "Reflexiono críticamente sobre la falta de diversidad cultural del catálogo.", value: 5 },
+                    { text: "Cierro la aplicación y opto por catálogos alternativos o formatos independientes.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Hasta qué punto sientes que controlas tu catálogo de recomendaciones en {plataforma}?",
+                options: [
+                    { text: "Nada, me limito a lo que la portada me pone delante.", value: 1 },
+                    { text: "Algo, porque lo voy moldeando al añadir obras a mis listas o favoritos.", value: 2 },
+                    { text: "Bastante, porque busco activamente saltándome la página principal.", value: 3 },
+                    { text: "Total, ignoro las sugerencias automáticas y voy directo a lo que quiero consumir.", value: 6 }
+                ]
+            },
+            {
+                text: "Para descubrir joyas ocultas u obras menos conocidas en {plataforma}, ¿qué haces?",
+                options: [
+                    { text: "Dejo que la reproducción automática me sorprenda.", value: 1 },
+                    { text: "Exploro subcategorías o listas temáticas específicas sugeridas en la interfaz.", value: 3 },
+                    { text: "Consulto foros, revistas o pregunto a personas fuera del ecosistema de la app.", value: 4 },
+                    { text: "Investigo en bases de datos independientes para encontrar contenido de nicho.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Qué opinión te merecen las listas de 'Top 10' o 'Más populares' en {plataforma}?",
+                options: [
+                    { text: "Son la opción más segura y rápida para elegir qué consumir hoy.", value: 1 },
+                    { text: "Las reviso por curiosidad, pero solo escojo lo que encaja en mis gustos.", value: 2 },
+                    { text: "Las uso como referencia, pero siempre valido su calidad en otros sitios.", value: 4 },
+                    { text: "Suelo evitarlas activamente porque suelen beneficiar a las grandes producciones.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Con qué frecuencia exploras géneros muy alejados de tus preferencias habituales en {plataforma}?",
+                options: [
+                    { text: "Nunca, prefiero confiar en la zona de confort que me ofrece el inicio.", value: 1 },
+                    { text: "Raramente, solo lo hago si el sistema me lo recomienda directamente.", value: 2 },
+                    { text: "Frecuentemente, usando el buscador manual para encontrar variedad.", value: 3 },
+                    { text: "Siempre, hago una búsqueda sistemática para acceder a una oferta cultural plural.", value: 6 }
+                ]
+            },
+            {
+                text: "Al añadir contenido a 'Mi lista' o dar 'Me gusta' en {plataforma}, ¿qué buscas principalmente?",
+                options: [
+                    { text: "Lo hago por automatismo, y muchas veces no lo vuelvo a mirar.", value: 1 },
+                    { text: "Lo hago para afinar el algoritmo y que me sugiera cosas similares en el futuro.", value: 2 },
+                    { text: "Evito hacerlo mucho para no reducir la diversidad de lo que me muestran.", value: 5 },
+                    { text: "Para mantener un archivo personal de obras que realmente valoro como arte.", value: 6 }
+                ]
+            },
+            {
+                text: "Si llevas demasiado tiempo navegando por el menú de {plataforma} sin decidirte, ¿qué haces?",
+                options: [
+                    { text: "Acabo poniendo cualquier cosa sugerida en portada para no pensar más.", value: 1 },
+                    { text: "Afino la búsqueda utilizando categorías, directores o artistas específicos.", value: 3 },
+                    { text: "Consulto alguna web externa de reseñas para salir de dudas y elegir.", value: 4 },
+                    { text: "Apago la pantalla y decido hacer otra actividad ajena a lo digital.", value: 6 }
+                ]
+            },
+            {
+                text: "¿Cuál sería tu experiencia ideal al usar {plataforma}?",
+                options: [
+                    { text: "Que acierte siempre y me ponga contenido ideal sin tener que navegar.", value: 1 },
+                    { text: "Que aprenda de mis hábitos para crear un entorno perfectamente personalizado.", value: 2 },
+                    { text: "Que funcione como un gran archivo neutral donde yo busco activamente.", value: 3 },
+                    { text: "Que sea solo un proveedor de acceso, manteniendo mi criterio libre y soberano.", value: 6 }
+                ]
+            }
+        ];
+
+        // Lista de plataformas y sus iconos SVG
+        const platformList = ['Instagram', 'TikTok', 'YouTube', 'Netflix', 'Prime Video', 'Disney+', 'HBO', 'Spotify', 'Otra'];
+
+        function getPlatformLogo(platformName) {
+            const name = platformName.toLowerCase();
+            const baseClasses = "w-8 h-8 flex-shrink-0 mt-0.5";
+            
+            if (name.includes('instagram')) {
+                return `<svg class="${baseClasses} text-pink-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>`;
+            } else if (name.includes('tiktok')) {
+                return `<svg class="${baseClasses} text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 2.23-1.07 4.45-2.83 5.92-2.03 1.69-4.9 2.25-7.34 1.55-2.47-.7-4.43-2.61-5.18-5.06-.75-2.43-.28-5.15 1.34-7.2 1.59-2.03 4.24-3.1 6.81-2.92.03 1.37.01 2.75.02 4.13-1.01-.13-2.07-.06-3.03.35-1.01.42-1.84 1.25-2.18 2.28-.35 1.05-.22 2.25.35 3.19.56.92 1.57 1.49 2.65 1.57 1.12.08 2.26-.22 3.11-.93.85-.71 1.36-1.8 1.37-2.93.02-4.63.01-9.25.01-13.88z"/></svg>`;
+            } else if (name.includes('youtube')) {
+                return `<svg class="${baseClasses} text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
+            } else if (name.includes('netflix')) {
+                return `<svg class="${baseClasses} text-red-700" viewBox="0 0 24 24" fill="currentColor"><path d="M11.996 0C5.372 0 0 5.373 0 11.996 0 18.62 5.372 24 11.996 24 18.62 24 24 18.62 24 11.996 24 5.373 18.62 0 11.996 0zM15.42 18.49l-3.374-7.85-1.235 7.698H8.56l1.373-10.999h2.383l3.36 7.842 1.236-7.842h2.245L17.79 18.49h-2.37z"/></svg>`;
+            } else if (name.includes('spotify')) {
+                return `<svg class="${baseClasses} text-green-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.44-.48.18-1.02-.06-1.14-.54-.12-.48.06-1.02.54-1.14 4.32-1.26 9.72-.6 13.5 1.74.42.24.54.84.3 1.26zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.18-1.2-.18-1.38-.78-.18-.6.18-1.2.78-1.38 4.32-1.26 11.28-1.02 15.72 1.62.54.3.72 1.02.42 1.56-.24.48-.9.72-1.5.36z"/></svg>`;
+            } else if (name.includes('prime')) {
+                return `<svg class="${baseClasses} text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M15.48 18.67c-2.4 1.15-5.26 1.44-7.85.74C5.17 18.73 3 17 1.8 14.8c-.28-.5-.5-1.03-.68-1.57-.12-.35.4-.55.66-.3 2.1 2.05 4.86 3.33 7.8 3.65 2.76.3 5.56-.4 8.02-1.8.35-.2.78.2.6.54-.42.82-.94 1.58-1.54 2.27-.3.35-.85.3-1.18-.08zM21.9 16.14c-.38 1.4-1.53 2.5-2.9 2.87-1.1.3-2.27.08-3.15-.6-.7-.52-1.1-1.3-1.2-2.18-.1-.85.18-1.7.75-2.35.78-.88 2-1.3 3.16-1.15 1.34.18 2.47 1.14 2.92 2.4.1.33.5.25.5-.1v-1.7c0-.28.23-.5.5-.5h1.2c.28 0 .5.22.5.5v5.8c0 .28-.22.5-.5.5h-1.2c-.28 0-.5-.22-.5-.5v-1.45c0-.34-.4-.44-.6-.2z"/></svg>`;
+            } else if (name.includes('disney')) {
+                return `<div class="${baseClasses} rounded-full bg-blue-800 text-white flex items-center justify-center font-bold text-xs">D+</div>`;
+            } else if (name.includes('hbo')) {
+                return `<div class="${baseClasses} rounded-full bg-purple-900 text-white flex items-center justify-center font-bold text-xs" style="font-family: serif;">HBO</div>`;
+            }
+            // Ícono de brújula/mapa por defecto
+            return `<svg class="${baseClasses} text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>`;
+        }
+
+        // Estado de la aplicación
+        let currentQuestionIndex = 0;
+        let userScores = [];
+        let activeQuestions = [];
+        
+        // Datos de la persona participante
+        let participantData = {
+            platformSelected: '',
+            platformNameRaw: '',
+            platformType: '',
+            gender: '',
+            age: ''
+        };
+
+        const appContainer = document.getElementById('app');
+
+        /**
+         * Lógica del onboarding aventurero
+         */
+        function renderOnboardingStep(step) {
+            let content = '';
+
+            if (step === 0) {
+                // Bienvenida / Gancho
+                content = `
+                    <div class="p-10 text-center fade-in-up">
+                        <div class="mb-6 flex justify-center text-emerald-600">
+                            <svg class="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h1 class="text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">La Brújula Algorítmica</h1>
+                        <p class="text-lg text-slate-600 mb-10 leading-relaxed max-w-lg mx-auto">
+                            ¡Te damos la bienvenida a esta expedición digital! En un mar de recomendaciones automáticas, cada persona traza su propia ruta. ¿Te dejas llevar por la corriente o tomas el timón de tus decisiones?
+                        </p>
+                        <button onclick="renderOnboardingStep(1)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-lg shadow-emerald-200">
+                            Iniciar la aventura
+                        </button>
+                    </div>
+                `;
+            } else if (step === 1) {
+                // Elegir la plataforma
+                let gridHtml = '';
+                platformList.forEach(p => {
+                    gridHtml += `
+                        <button onclick="selectPlatform('${p}')" class="adventure-btn group">
+                            <div class="transform group-hover:scale-110 transition-transform">${getPlatformLogo(p)}</div>
+                            <span class="mt-3 text-sm font-bold text-slate-700">${p}</span>
+                        </button>
+                    `;
+                });
+
+                content = `
+                    <div class="p-8 fade-in-up">
+                        <div class="text-center mb-8">
+                            <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">Paso 1 de 3</span>
+                            <h2 class="text-2xl font-bold text-slate-800 mt-2">Elige tu destino de exploración</h2>
+                            <p class="text-slate-500 mt-2">¿En qué territorio digital vamos a adentrarnos hoy?</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 mb-6" id="platformGrid">
+                            ${gridHtml}
+                        </div>
+
+                        <!-- Panel oculto para 'Otra' -->
+                        <div id="otherPlatformDiv" class="hidden mt-6 bg-slate-50 p-6 rounded-2xl border border-slate-200 fade-in text-left">
+                            <h3 class="font-bold text-slate-800 mb-4">Territorio inexplorado</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-600 mb-1">Nombre del lugar</label>
+                                    <input type="text" id="otherPlatformName" placeholder="Ej: Twitch, Filmin..." class="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-600 mb-1">Tipo de ecosistema</label>
+                                    <select id="otherPlatformType" class="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-500 bg-white">
+                                        <option value="" disabled selected>Selecciona su tipo...</option>
+                                        <option value="social">Red Social (muros, vídeos cortos, creadores...)</option>
+                                        <option value="streaming">Streaming (películas, series, catálogos...)</option>
+                                    </select>
+                                </div>
+                                <div class="pt-2 text-right">
+                                    <button onclick="confirmOtherPlatform()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-xl transition-colors">Confirmar ruta</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (step === 2) {
+                // Elegir género (Lenguaje inclusivo)
+                const genders = ['Mujer', 'Hombre', 'Identidad No Binaria', 'Otra identidad', 'Prefiero no especificar'];
+                let genderHtml = '';
+                genders.forEach(g => {
+                    genderHtml += `
+                        <button onclick="selectGender('${g}')" class="w-full text-left p-4 mb-3 rounded-xl border-2 border-slate-200 bg-white hover:border-emerald-400 hover:bg-emerald-50 transition-all text-slate-700 font-bold text-lg shadow-sm">
+                            ${g}
+                        </button>
+                    `;
+                });
+
+                content = `
+                    <div class="p-8 fade-in-up">
+                        <div class="text-center mb-8">
+                            <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">Paso 2 de 3</span>
+                            <h2 class="text-2xl font-bold text-slate-800 mt-2">Diario de bitácora</h2>
+                            <p class="text-slate-500 mt-2">Para trazar bien el mapa, ¿cómo te identificas?</p>
+                        </div>
+                        <div class="max-w-md mx-auto">
+                            ${genderHtml}
+                        </div>
+                    </div>
+                `;
+            } else if (step === 3) {
+                // Elegir edad y comenzar
+                content = `
+                    <div class="p-8 fade-in-up text-center">
+                        <div class="mb-8 flex justify-center text-slate-400">
+                            <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase mb-2 block">Último paso</span>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-4">¿Cuántas vueltas al sol llevas recorridas?</h2>
+                        <p class="text-slate-500 mb-8">Escribe tu edad para completar el registro de la expedición.</p>
+                        
+                        <form onsubmit="submitAge(event)" class="max-w-xs mx-auto">
+                            <input type="number" id="ageInput" required min="0" max="99" placeholder="Ej: 25" class="w-full p-4 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 focus:outline-none focus:border-emerald-500 mb-6 shadow-inner">
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xl font-bold py-4 px-8 rounded-2xl transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2">
+                                <span>¡Izar las velas!</span>
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            </button>
+                        </form>
+                    </div>
+                `;
+            }
+
+            appContainer.innerHTML = content;
+        }
+
+        // Acciones del onboarding
+        function selectPlatform(platformStr) {
+            if (platformStr === 'Otra') {
+                document.getElementById('platformGrid').classList.add('hidden');
+                document.getElementById('otherPlatformDiv').classList.remove('hidden');
+            } else {
+                participantData.platformNameRaw = platformStr;
+                const socialPlatforms = ['Instagram', 'TikTok', 'YouTube'];
+                participantData.platformType = socialPlatforms.includes(platformStr) ? 'social' : 'streaming';
+                renderOnboardingStep(2);
+            }
+        }
+
+        function confirmOtherPlatform() {
+            const nameInput = document.getElementById('otherPlatformName').value.trim();
+            const typeInput = document.getElementById('otherPlatformType').value;
+            
+            if(!nameInput || !typeInput) {
+                alert("Por favor, rellena el nombre y el tipo de plataforma para continuar el viaje.");
+                return;
+            }
+            participantData.platformNameRaw = nameInput;
+            participantData.platformType = typeInput;
+            renderOnboardingStep(2);
+        }
+
+        function selectGender(genderStr) {
+            participantData.gender = genderStr;
+            renderOnboardingStep(3);
+        }
+
+        function submitAge(event) {
+            event.preventDefault();
+            participantData.age = document.getElementById('ageInput').value;
+            
+            // Asignar cuestionario correcto
+            if (participantData.platformType === 'social') {
+                activeQuestions = socialQuestions;
+            } else {
+                activeQuestions = streamingQuestions;
+            }
+            
+            // Ir directos al cuestionario, la presentación ya está hecha
+            startQuiz();
+        }
+
+        /**
+         * Inicia el cuestionario reiniciando el estado.
+         */
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            userScores = [];
+            renderQuestion();
+        }
+
+        /**
+         * Sustituye el tag {plataforma} por el nombre real de la plataforma elegida.
+         */
+        function formatText(text) {
+            return text.replace(/\{plataforma\}/g, `<span class="font-bold text-emerald-700">${participantData.platformNameRaw}</span>`);
+        }
+
+        /**
+         * Renderiza la pregunta actual con el logo de la plataforma.
+         */
+        function renderQuestion() {
+            const questionTemplate = activeQuestions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex) / activeQuestions.length) * 100;
+            const logo = getPlatformLogo(participantData.platformNameRaw);
+
+            let optionsHtml = '';
+            
+            // Mezclamos las opciones de forma aleatoria para no condicionar la respuesta
+            const shuffledOptions = [...questionTemplate.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach((option) => {
+                optionsHtml += `
+                    <button onclick="handleAnswer(${option.value})" class="w-full text-left p-4 mb-3 rounded-xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-slate-700 font-medium text-lg shadow-sm">
+                        ${formatText(option.text)}
+                    </button>
+                `;
+            });
+
+            appContainer.innerHTML = `
+                <div class="fade-in flex flex-col h-full">
+                    <!-- Barra de progreso tipo mapa -->
+                    <div class="h-2 w-full bg-slate-100 flex-shrink-0">
+                        <div class="h-2 bg-emerald-500 transition-all duration-500" style="width: ${progress}%"></div>
+                    </div>
+                    
+                    <div class="p-8 flex-grow">
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">Exploración ${currentQuestionIndex + 1}/${activeQuestions.length}</span>
+                            ${logo}
+                        </div>
+                        
+                        <h2 class="text-2xl font-bold text-slate-800 mb-8 leading-tight">
+                            ${formatText(questionTemplate.text)}
+                        </h2>
+                        
+                        <div class="mt-4">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Guarda la respuesta y avanza o muestra los resultados.
+         */
+        function handleAnswer(value) {
+            userScores.push(value);
+            
+            if (currentQuestionIndex < activeQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                calculateAndShowResults();
+            }
+        }
+
+        /**
+         * Envía los datos de participación y resultados (incluyendo la Fase) a un Google Sheet
+         */
+        function sendDataToGoogleSheets(average, profileName, phaseName) {
+            // URL DEL WEBHOOK (Apps Script)
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzRe1tnBL0skKvXkni6eojEtAaZzJ6Nrn03Sns2KCfKUl-4jSzYB6zPINukv6W3TzcGdQ/exec'; 
+
+            const dataToSave = {
+                platform: participantData.platformNameRaw,
+                platformType: participantData.platformType,
+                gender: participantData.gender,
+                age: participantData.age,
+                score: average.toFixed(2),
+                profile: profileName,
+                phase: phaseName
+            };
+            
+            const urlParams = new URLSearchParams(dataToSave).toString();
+
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: urlParams,
+                mode: 'no-cors' 
+            })
+            .then(() => console.log("Expedición registrada con éxito."))
+            .catch(error => console.error("La señal de radio falló:", error));
+        }
+
+        /**
+         * Calcula la media, determina el perfil, la fase algorítmica y lo muestra.
+         */
+        function calculateAndShowResults() {
+            const totalScore = userScores.reduce((acc, curr) => acc + curr, 0);
+            const average = totalScore / activeQuestions.length;
+            
+            // Perfiles Generales (Ajustados con la metáfora del viaje)
+            let profileName = "";
+            let profileColor = "";
+            let profileDescription = "";
+
+            if (average < 2.5) {
+                profileName = "Persona Pasajera";
+                profileColor = "text-pink-600";
+                profileDescription = `En tu viaje por <strong>${participantData.platformNameRaw}</strong> prefieres contratar el paquete de "todo incluido" de la agencia turística algorítmica. Confías plenamente en el itinerario preestablecido, dejándote llevar por las rutas más comerciales y visitando cómodamente los lugares que la plataforma organiza para ti, sin salir de la ruta marcada.`;
+            } else if (average < 4.5) {
+                profileName = "Persona Navegante";
+                profileColor = "text-emerald-600";
+                profileDescription = `Tu paso por <strong>${participantData.platformNameRaw}</strong> es como unirte a un "free tour" con una buena guía de viaje en el bolsillo. Aprovechas los circuitos organizados que te ofrece el sistema, pero a veces decides desviarte por una callejuela que te llama la atención, preguntas a la gente local y mantienes un equilibrio entre la ruta turística y tu propia curiosidad.`;
+            } else {
+                profileName = "Persona Soberana";
+                profileColor = "text-slate-800";
+                profileDescription = `¡Tu espíritu es totalmente libre y amante de la aventura! En <strong>${participantData.platformNameRaw}</strong> huyes de los viajes masificados y te mueves "por libre", trazando tu propio mapa. Buscas joyas ocultas fuera del circuito comercial, cuestionas siempre el folleto turístico que te intentan vender y, si el paisaje no te convence, haces las maletas hacia nuevos horizontes.`;
+            }
+
+            // Fase Específica Académica (para Google Sheets)
+            const roundedAverage = Math.round(average);
+            let phaseName = "";
+            switch(roundedAverage) {
+                case 1: phaseName = "Sumisión algorítmica total"; break;
+                case 2: phaseName = "Aceptación selectiva interna"; break;
+                case 3: phaseName = "Exploración guiada"; break;
+                case 4: phaseName = "Contraste externo"; break;
+                case 5: phaseName = "Valoración crítica"; break;
+                case 6: phaseName = "Elección autónoma"; break;
+                default: phaseName = "Indeterminado";
+            }
+
+            // Guardar en base de datos
+            sendDataToGoogleSheets(average, profileName, phaseName);
+
+            // Fórmula visual: (Media - 1) * 60
+            const needleAngle = ((average - 1) * 60);
+            const logo = getPlatformLogo(participantData.platformNameRaw);
+
+            appContainer.innerHTML = `
+                <div class="p-8 fade-in text-center flex flex-col h-full">
+                    <div class="mb-4 flex justify-center">${logo}</div>
+                    <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase block mb-1">Fin de la expedición</span>
+                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Perfil: <span class="${profileColor}">${profileName}</span></h2>
+                    <p class="text-slate-600 mb-10 max-w-md mx-auto p-4 bg-slate-50 rounded-xl">${profileDescription}</p>
+
+                    <div class="relative w-full flex justify-center py-12 mb-6">
+                        <div class="compass-container">
+                            
+                            <!-- Marcas de agua centradas y grandes -->
+                            <div class="profile-label profile-pasajera">Pasajera</div>
+                            <div class="profile-label profile-navegante">Navegante</div>
+                            <div class="profile-label profile-soberana">Soberana</div>
+
+                            <div class="compass-node node-1"></div>
+                            <div class="compass-node node-2"></div>
+                            <div class="compass-node node-3"></div>
+                            <div class="compass-node node-4"></div>
+                            <div class="compass-node node-5"></div>
+                            <div class="compass-node node-6"></div>
+
+                            <!-- 1. Fase: Arriba -->
+                            <div class="compass-label label-1">
+                                <span class="block font-bold">Sumisión algorítmica</span>
+                                <span class="font-normal text-xs text-slate-500">Viaje "todo incluido"</span>
+                            </div>
+                            <div class="tooltip tooltip-1 tooltip-down">Aceptación acrítica de las recomendaciones automatizadas, delegando por completo la selección de contenidos al sistema en un estado de pasividad operativa.</div>
+                            
+                            <!-- 2. Fase: Arriba Derecha -->
+                            <div class="compass-label label-2">
+                                <span class="block font-bold">Aceptación selectiva</span>
+                                <span class="font-normal text-xs text-slate-500">Excursiones de agencia</span>
+                            </div>
+                            <div class="tooltip tooltip-2">Interacción superficial que acepta las sugerencias del sistema, aplicando filtros mínimos para adaptar levemente el modelo algorítmico al perfil.</div>
+                            
+                            <!-- 3. Fase: Abajo Derecha -->
+                            <div class="compass-label label-3">
+                                <span class="block font-bold">Exploración guiada</span>
+                                <span class="font-normal text-xs text-slate-500">Viaje con guía</span>
+                            </div>
+                            <div class="tooltip tooltip-3">Uso instrumental de las herramientas nativas de la plataforma para dirigir activamente las recomendaciones y negociar los resultados del algoritmo.</div>
+                            
+                            <!-- 4. Fase: Abajo -->
+                            <div class="compass-label label-4">
+                                <span class="block font-bold">Contraste externo</span>
+                                <span class="font-normal text-xs text-slate-500">Consulta de mapas</span>
+                            </div>
+                            <div class="tooltip tooltip-4 tooltip-up">Comprobación de la validez de las recomendaciones mediante la consulta activa de fuentes de información y referencias ajenas al ecosistema cerrado.</div>
+                            
+                            <!-- 5. Fase: Abajo Izquierda -->
+                            <div class="compass-label label-5">
+                                <span class="block font-bold">Valoración crítica</span>
+                                <span class="font-normal text-xs text-slate-500">Mirada fuera de ruta</span>
+                            </div>
+                            <div class="tooltip tooltip-5">Reflexión analítica sobre los sesgos comerciales, ideológicos o de diseño de los sistemas de recomendación, evaluando críticamente el entorno.</div>
+                            
+                            <!-- 6. Fase: Arriba Izquierda -->
+                            <div class="compass-label label-6">
+                                <span class="block font-bold">Elección autónoma</span>
+                                <span class="font-normal text-xs text-slate-500">Aventura por libre</span>
+                            </div>
+                            <div class="tooltip tooltip-6">Ejercicio pleno de la agencia, caracterizado por la evasión de la curaduría automatizada y la búsqueda independiente de contenidos culturales.</div>
+
+                            <!-- Centro de la brújula -->
+                            <div class="compass-center"></div>
+                            
+                            <!-- Aguja giratoria (z:30, bajo Tooltips z:40, pero sobre etiquetas z:20) -->
+                            <div class="compass-needle" id="needle"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex flex-col items-center gap-4 relative z-10">
+                        <button onclick="renderOnboardingStep(0)" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-full transition-all shadow-lg flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                            Explorar otro territorio
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const needle = document.getElementById('needle');
+                if(needle) {
+                    // Rota de 0 a 300 grados exactos
+                    needle.style.transform = `rotate(${needleAngle}deg)`;
+                }
+            }, 100);
+        }
+
+        // Arrancamos la aplicación en el Paso 0 (Intro de la expedición)
+        renderOnboardingStep(0);
+
+    </script>
+</body>
+</html>
