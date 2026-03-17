@@ -30,6 +30,7 @@
          * 20: Etiquetas blancas (.compass-label)
          * 30: Aguja (.compass-needle) -> Por encima de las blancas
          * 40: Tooltips negros académicos (.tooltip) -> Por encima de la aguja
+         * 100: Ventana Modal de consejos
          */
 
         .compass-container {
@@ -164,37 +165,31 @@
         }
 
         /* Posicionamiento y flechas de cada Tooltip individual */
-        /* Tooltip 1 (Arriba -> se despliega hacia abajo) */
         .tooltip-1 { top: 0%; left: 50%; transform: translate(-50%, 35px); }
         .label-1:hover ~ .tooltip-1, .tooltip-1:hover { transform: translate(-50%, 30px); opacity: 1; visibility: visible; }
         .tooltip-1::after { content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-bottom-color: #0f172a; }
-        .tooltip-1::before { content: ''; position: absolute; bottom: 100%; left: 0; right: 0; height: 40px; } /* Puente invisible para mantener el hover */
+        .tooltip-1::before { content: ''; position: absolute; bottom: 100%; left: 0; right: 0; height: 40px; }
 
-        /* Tooltip 2 (Arriba Derecha -> se despliega hacia la izquierda) */
         .tooltip-2 { top: 25%; left: 93.3%; transform: translate(calc(-100% - 65px), -50%); }
         .label-2:hover ~ .tooltip-2, .tooltip-2:hover { transform: translate(calc(-100% - 60px), -50%); opacity: 1; visibility: visible; }
         .tooltip-2::after { content: ''; position: absolute; top: 50%; left: 100%; transform: translateY(-50%); border: 6px solid transparent; border-left-color: #0f172a; }
         .tooltip-2::before { content: ''; position: absolute; top: -20px; bottom: -20px; left: 100%; width: 70px; }
 
-        /* Tooltip 3 (Abajo Derecha -> se despliega hacia la izquierda) */
         .tooltip-3 { top: 75%; left: 93.3%; transform: translate(calc(-100% - 65px), -50%); }
         .label-3:hover ~ .tooltip-3, .tooltip-3:hover { transform: translate(calc(-100% - 60px), -50%); opacity: 1; visibility: visible; }
         .tooltip-3::after { content: ''; position: absolute; top: 50%; left: 100%; transform: translateY(-50%); border: 6px solid transparent; border-left-color: #0f172a; }
         .tooltip-3::before { content: ''; position: absolute; top: -20px; bottom: -20px; left: 100%; width: 70px; }
 
-        /* Tooltip 4 (Abajo -> se despliega hacia arriba) */
         .tooltip-4 { top: 100%; left: 50%; transform: translate(-50%, calc(-100% - 35px)); }
         .label-4:hover ~ .tooltip-4, .tooltip-4:hover { transform: translate(-50%, calc(-100% - 30px)); opacity: 1; visibility: visible; }
         .tooltip-4::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #0f172a; }
         .tooltip-4::before { content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 40px; }
 
-        /* Tooltip 5 (Abajo Izquierda -> se despliega hacia la derecha) */
         .tooltip-5 { top: 75%; left: 6.7%; transform: translate(65px, -50%); }
         .label-5:hover ~ .tooltip-5, .tooltip-5:hover { transform: translate(60px, -50%); opacity: 1; visibility: visible; }
         .tooltip-5::after { content: ''; position: absolute; top: 50%; right: 100%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: #0f172a; }
         .tooltip-5::before { content: ''; position: absolute; top: -20px; bottom: -20px; right: 100%; width: 70px; }
 
-        /* Tooltip 6 (Arriba Izquierda -> se despliega hacia la derecha) */
         .tooltip-6 { top: 25%; left: 6.7%; transform: translate(65px, -50%); }
         .label-6:hover ~ .tooltip-6, .tooltip-6:hover { transform: translate(60px, -50%); opacity: 1; visibility: visible; }
         .tooltip-6::after { content: ''; position: absolute; top: 50%; right: 100%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: #0f172a; }
@@ -477,6 +472,72 @@
         const appContainer = document.getElementById('app');
 
         /**
+         * Funciones para manejar la ventana Modal de Consejos
+         */
+        function openTipsModal() {
+            const modal = document.getElementById('tipsModal');
+            const modalContent = document.getElementById('tipsModalContent');
+            modal.classList.remove('hidden');
+            // Forzar reflow para que la transición funcione
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }
+
+        function closeTipsModal() {
+            const modal = document.getElementById('tipsModal');
+            const modalContent = document.getElementById('tipsModalContent');
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        /**
+         * Maneja el flujo cuando se clica en "Explorar otro territorio"
+         */
+        function resetForAnotherTerritory() {
+            // Limpiamos los datos de la plataforma elegida anteriormente
+            participantData.platformSelected = '';
+            participantData.platformNameRaw = '';
+            participantData.platformType = '';
+
+            // Si dio su consentimiento Y YA tenemos sus datos demográficos
+            if (participantData.consentToSave && participantData.gender !== '' && participantData.age !== '') {
+                renderOnboardingStep(2); // Va directo a seleccionar plataforma
+            } else {
+                // Si no dio consentimiento, se reinicia todo desde el pacto
+                participantData.gender = '';
+                participantData.age = '';
+                participantData.consentToSave = true; // Reseteamos el checkbox por defecto
+                renderOnboardingStep(0);
+            }
+        }
+
+        /**
+         * Manejador de flujo general tras seleccionar la plataforma desde el Onboarding
+         */
+        function proceedAfterPlatform() {
+            // Asignar cuestionario correcto según tipo de plataforma
+            if (participantData.platformType === 'social') {
+                activeQuestions = socialQuestions;
+            } else {
+                activeQuestions = streamingQuestions;
+            }
+
+            // Si NO hay consentimiento, ir directo al cuestionario saltando la demografía
+            if (!participantData.consentToSave) {
+                startQuiz();
+            } else if (participantData.gender !== '' && participantData.age !== '') {
+                // Ya tenemos los datos demográficos (viene de "Explorar otro territorio"), saltar a Quiz
+                startQuiz();
+            } else {
+                renderOnboardingStep(3); // Continuar a pedir género
+            }
+        }
+
+        /**
          * Lógica del onboarding aventurero
          */
         function renderOnboardingStep(step) {
@@ -544,7 +605,7 @@
                 content = `
                     <div class="p-8 fade-in-up">
                         <div class="text-center mb-8">
-                            <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">Paso 1 de 3</span>
+                            <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">Paso 1</span>
                             <h2 class="text-2xl font-bold text-slate-800 mt-2">Elige tu destino de exploración</h2>
                             <p class="text-slate-500 mt-2">¿En qué territorio digital vamos a adentrarnos hoy?</p>
                         </div>
@@ -577,7 +638,7 @@
                     </div>
                 `;
             } else if (step === 3) {
-                // Elegir género (Lenguaje inclusivo)
+                // Elegir género (Lenguaje inclusivo) - Solo se muestra si hay consentimiento
                 const genders = ['Mujer', 'Hombre', 'Identidad No Binaria', 'Otra identidad', 'Prefiero no especificar'];
                 let genderHtml = '';
                 genders.forEach(g => {
@@ -591,7 +652,7 @@
                 content = `
                     <div class="p-8 fade-in-up">
                         <div class="text-center mb-8">
-                            <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">Paso 2 de 3</span>
+                            <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">Paso 2</span>
                             <h2 class="text-2xl font-bold text-slate-800 mt-2">Diario de bitácora</h2>
                             <p class="text-slate-500 mt-2">Para trazar bien el mapa, ¿cómo te identificas?</p>
                         </div>
@@ -601,7 +662,7 @@
                     </div>
                 `;
             } else if (step === 4) {
-                // Elegir edad y comenzar
+                // Elegir edad y comenzar - Solo se muestra si hay consentimiento
                 content = `
                     <div class="p-8 fade-in-up text-center">
                         <div class="mb-8 flex justify-center text-slate-400">
@@ -642,7 +703,7 @@
                 participantData.platformNameRaw = platformStr;
                 const socialPlatforms = ['Instagram', 'TikTok', 'YouTube'];
                 participantData.platformType = socialPlatforms.includes(platformStr) ? 'social' : 'streaming';
-                renderOnboardingStep(3);
+                proceedAfterPlatform(); // Flujo derivado según consentimiento
             }
         }
 
@@ -656,7 +717,7 @@
             }
             participantData.platformNameRaw = nameInput;
             participantData.platformType = typeInput;
-            renderOnboardingStep(3);
+            proceedAfterPlatform(); // Flujo derivado según consentimiento
         }
 
         function selectGender(genderStr) {
@@ -667,15 +728,6 @@
         function submitAge(event) {
             event.preventDefault();
             participantData.age = document.getElementById('ageInput').value;
-            
-            // Asignar cuestionario correcto
-            if (participantData.platformType === 'social') {
-                activeQuestions = socialQuestions;
-            } else {
-                activeQuestions = streamingQuestions;
-            }
-            
-            // Ir directos al cuestionario
             startQuiz();
         }
 
@@ -793,7 +845,7 @@
         }
 
         /**
-         * Calcula la media, determina el perfil, la fase algorítmica y lo muestra.
+         * Calcula la media, determina el perfil, la fase algorítmica y lo muestra con consejos dinámicos.
          */
         function calculateAndShowResults() {
             const totalScore = userScores.reduce((acc, curr) => acc + curr, 0);
@@ -818,17 +870,50 @@
                 profileDescription = `¡Tu espíritu es totalmente libre y amante de la aventura! En <strong>${participantData.platformNameRaw}</strong> huyes de los viajes masificados y te mueves "por libre", trazando tu propio mapa. Buscas joyas ocultas fuera del circuito comercial, cuestionas siempre el folleto turístico que te intentan vender y, si el paisaje no te convence, haces las maletas hacia nuevos horizontes.`;
             }
 
-            // Fase Específica Académica (para Google Sheets)
+            // Fase Específica Académica (para Google Sheets) y Contenido de los Consejos
             const roundedAverage = Math.round(average);
             let phaseName = "";
+            let tipsContent = "";
+
             switch(roundedAverage) {
-                case 1: phaseName = "Sumisión algorítmica total"; break;
-                case 2: phaseName = "Aceptación selectiva interna"; break;
-                case 3: phaseName = "Exploración guiada"; break;
-                case 4: phaseName = "Contraste externo"; break;
-                case 5: phaseName = "Valoración crítica"; break;
-                case 6: phaseName = "Elección autónoma"; break;
-                default: phaseName = "Indeterminado";
+                case 1: 
+                    phaseName = "Sumisión algorítmica total"; 
+                    tipsContent = `<h4 class="text-lg font-bold text-emerald-700 mb-2">Siguiente destino: Excursiones personalizadas</h4>
+                                   <p class="mb-4">Has disfrutado del viaje con todo incluido, pero es hora de empezar a elegir tus propias rutas.</p>
+                                   <p><strong>💡 El consejo de la expedición:</strong> Usa los botones de "Me gusta" o "No me interesa" activamente. Obliga a la agencia turística algorítmica a escuchar tus preferencias en lugar de aceptar pasivamente su menú del día.</p>`;
+                    break;
+                case 2: 
+                    phaseName = "Aceptación selectiva interna"; 
+                    tipsContent = `<h4 class="text-lg font-bold text-emerald-700 mb-2">Siguiente destino: Tomar el timón</h4>
+                                   <p class="mb-4">Ya filtras lo que no te gusta, ¡es un gran paso! Ahora te toca tomar la iniciativa.</p>
+                                   <p><strong>💡 El consejo de la expedición:</strong> En lugar de esperar a que la pantalla te ofrezca contenido, usa el buscador. Busca activamente creadores, géneros o temáticas concretas. Conviértete en la persona que guía la expedición.</p>`;
+                    break;
+                case 3: 
+                    phaseName = "Exploración guiada"; 
+                    tipsContent = `<h4 class="text-lg font-bold text-emerald-700 mb-2">Siguiente destino: Contrastar los mapas</h4>
+                                   <p class="mb-4">Sabes moverte por la plataforma y guiar tu ruta, pero a veces los mapas oficiales ocultan información.</p>
+                                   <p><strong>💡 El consejo de la expedición:</strong> Cuando la plataforma te recomiende algo con mucha insistencia, sal de la aplicación y busca opiniones en webs externas, foros o comunidades. No te quedes solo con la versión oficial de la agencia.</p>`;
+                    break;
+                case 4: 
+                    phaseName = "Contraste externo"; 
+                    tipsContent = `<h4 class="text-lg font-bold text-emerald-700 mb-2">Siguiente destino: Cuestionar a la agencia</h4>
+                                   <p class="mb-4">Ya contrastas la información fuera, ahora toca afilar tu mirada crítica hacia quien organiza el viaje.</p>
+                                   <p><strong>💡 El consejo de la expedición:</strong> Pregúntate siempre *por qué* te recomiendan algo. ¿Es una campaña pagada? ¿Es contenido diseñado para retenerte horas en la pantalla? Reconocer los intereses comerciales detrás de la recomendación te hará imparable.</p>`;
+                    break;
+                case 5: 
+                    phaseName = "Valoración crítica"; 
+                    tipsContent = `<h4 class="text-lg font-bold text-emerald-700 mb-2">Siguiente destino: La aventura total</h4>
+                                   <p class="mb-4">Tienes una gran capacidad crítica. El último paso es la independencia total.</p>
+                                   <p><strong>💡 El consejo de la expedición:</strong> Dedica tiempo a descubrir cultura e información completamente fuera de las grandes plataformas comerciales. Apoya espacios independientes, fanzines, blogs o catálogos alternativos. ¡Crea tus propias rutas inexploradas!</p>`;
+                    break;
+                case 6: 
+                    phaseName = "Elección autónoma"; 
+                    tipsContent = `<h4 class="text-lg font-bold text-emerald-700 mb-2">¡Eres soberanía pura!</h4>
+                                   <p class="mb-4">Has alcanzado el nivel máximo de agencia en esta expedición.</p>
+                                   <p><strong>💡 El consejo de la expedición:</strong> Sigue manteniendo esta gran autonomía y comparte tus descubrimientos (tus "mapas secretos") con tu comunidad. Ayuda a otras personas a salir de sus propias rutas comerciales y enséñales a explorar con libertad.</p>`;
+                    break;
+                default: 
+                    phaseName = "Indeterminado";
             }
 
             // Guardar en base de datos
@@ -843,7 +928,16 @@
                     <div class="mb-4 flex justify-center">${logo}</div>
                     <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase block mb-1">Fin de la expedición</span>
                     <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Perfil: <span class="${profileColor}">${profileName}</span></h2>
-                    <p class="text-slate-600 mb-10 max-w-md mx-auto p-4 bg-slate-50 rounded-xl">${profileDescription}</p>
+                    
+                    <div class="max-w-md mx-auto p-4 bg-slate-50 rounded-xl mb-4">
+                        <p class="text-slate-600">${profileDescription}</p>
+                    </div>
+
+                    <!-- Botón para abrir la ventana modal con los consejos -->
+                    <button onclick="openTipsModal()" class="mb-10 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-2.5 px-6 rounded-full border border-amber-300 transition-colors shadow-sm flex items-center justify-center gap-2 mx-auto">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                        Consejos para mejorar tu agencia
+                    </button>
 
                     <div class="relative w-full flex justify-center py-12 mb-6">
                         <div class="compass-container">
@@ -911,10 +1005,31 @@
                     </div>
 
                     <div class="mt-8 flex flex-col items-center gap-4 relative z-10">
-                        <button onclick="renderOnboardingStep(0)" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-full transition-all shadow-lg flex items-center gap-2">
+                        <button onclick="resetForAnotherTerritory()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-full transition-all shadow-lg flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                             Explorar otro territorio
                         </button>
+                    </div>
+
+                    <!-- Estructura de la Ventana Modal para los Consejos (z-[100]) -->
+                    <div id="tipsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+                        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform scale-95 transition-transform duration-300 text-left relative" id="tipsModalContent">
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                                    <svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                                    Cuaderno de viaje
+                                </h3>
+                                <button onclick="closeTipsModal()" class="text-slate-400 hover:text-slate-700 transition-colors bg-slate-100 hover:bg-slate-200 rounded-full p-1">
+                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+                            <div class="text-slate-600 leading-relaxed">
+                                ${tipsContent}
+                            </div>
+                            <button onclick="closeTipsModal()" class="mt-8 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-md">
+                                Entendido, ¡a explorar!
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
