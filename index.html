@@ -105,6 +105,8 @@
             opacity: 0.15;
             z-index: 5;
             pointer-events: none;
+            text-align: center;
+            line-height: 1.1;
         }
         .profile-pasajera { top: 35%; left: 65%; color: #ef4444; }
         .profile-navegante { top: 65%; left: 65%; color: #10b981; }
@@ -212,6 +214,10 @@
             <svg class="w-4 h-4 rounded-full overflow-hidden" viewBox="0 0 60 30" preserveAspectRatio="none"><rect width="60" height="30" fill="#F1BF00"/><rect y="3" width="60" height="3" fill="#AA151B"/><rect y="9" width="60" height="3" fill="#AA151B"/><rect y="15" width="60" height="3" fill="#AA151B"/><rect y="21" width="60" height="3" fill="#AA151B"/></svg>
             Català
         </button>
+        <button onclick="setLang('gl')" id="btn-gl" class="lang-btn flex items-center gap-2 bg-white px-3 py-2 rounded-full shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors text-xs font-bold text-slate-600">
+            <svg class="w-4 h-4 rounded-full overflow-hidden" viewBox="0 0 60 30" preserveAspectRatio="none"><rect width="60" height="30" fill="#fff"/><polygon points="0,0 20,0 60,30 40,30" fill="#00b3e3" /></svg>
+            Galego
+        </button>
     </div>
 
     <!-- Embolcall per mantenir el footer al final -->
@@ -254,6 +260,7 @@
             } else if (name.includes('hbo')) {
                 return `<div class="${baseClasses} rounded-full bg-purple-900 text-white flex items-center justify-center font-bold text-xs" style="font-family: serif;">HBO</div>`;
             }
+            // Ícono de brújula/mapa por defecto
             return `<svg class="${baseClasses} text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>`;
         }
 
@@ -291,7 +298,7 @@
                 results: {
                     profPass: "Persona Pasajera",
                     profNav: "Persona Navegante",
-                    profSob: "Persona Soberana",
+                    profSob: "Persona<br>Soberana",
                     descPass: `En tu viaje por <strong>{plataforma}</strong> prefieres contratar el paquete de "todo incluido" de la agencia turística algorítmica. Confías plenamente en el itinerario preestablecido, dejándote llevar por las rutas más comerciales y visitando cómodamente los lugares que la plataforma organiza para ti, sin salir de la ruta marcada.`,
                     descNav: `Tu paso por <strong>{plataforma}</strong> es como unirte a un "free tour" con una buena guía de viaje en el bolsillo. Aprovechas los circuitos organizados que te ofrece el sistema, pero a veces decides desviarte por una callejuela que te llama la atención, preguntas a la gente local y mantienes un equilibrio entre la ruta turística y tu propia curiosidad.`,
                     descSob: `¡Tu espíritu es totalmente libre y amante de la aventura! En <strong>{plataforma}</strong> huyes de los viajes masificados y te mueves "por libre", trazando tu propio mapa. Buscas joyas ocultas fuera del circuito comercial, cuestionas siempre el folleto turístico que te intentan vender y, si el paisaje no te convence, haces las maletas hacia nuevos horizontes.`,
@@ -529,7 +536,7 @@
                 results: {
                     profPass: "Persona Passatgera",
                     profNav: "Persona Navegant",
-                    profSob: "Persona Sobirana",
+                    profSob: "Persona<br>Sobirana",
                     descPass: `En el teu viatge per <strong>{plataforma}</strong> prefereixes contractar el paquet de "tot inclòs" de l'agència turística algorítmica. Confies plenament en l'itinerari preestablert, deixant-te portar per les rutes més comercials i visitant còmodament els llocs que la plataforma organitza per a tu, sense sortir de la ruta marcada.`,
                     descNav: `El teu pas per <strong>{plataforma}</strong> és com unir-te a un "free tour" amb una bona guia de viatge a la butxaca. Aprofites els circuits organitzats que t'ofereix el sistema, però a vegades decideixes desviar-te per un carreró que et crida l'atenció, preguntes a la gent local i mantens un equilibri entre la ruta turística i la teva pròpia curiositat.`,
                     descSob: `El teu esperit és totalment lliure i amant de l'aventura! A <strong>{plataforma}</strong> fuges dels viatges massificats i et mous "per lliure", traçant el teu propi mapa. Busques joies ocultes fora del circuit comercial, qüestiones sempre el fulletó turístic que t'intenten vendre i, si el paisatge no et convenç, fas les maletes cap a nous horitzons.`,
@@ -538,7 +545,7 @@
                         { t: "Acceptació selectiva", s: 'Excursions d\'agència', th: 'Interacció', tt: "Interacció superficial que accepta els suggeriments del sistema, aplicant filtres mínims per adaptar lleument el model algorítmic al perfil." },
                         { t: "Exploració guiada", s: 'Viatge amb guia', th: 'Resistència', tt: "Ús instrumental de les eines natives de la plataforma per dirigir activament les recomanacions i negociar els resultats de l'algorisme." },
                         { t: "Contrast extern", s: 'Consulta de mapes', th: 'Evasió', tt: "Comprovació de la validesa de les recomanacions mitjançant la consulta activa de fonts d'informació i referències alienes a l'ecosistema tancat." },
-                        { t: "Valoración crítica", s: 'Mirada fora de ruta', th: 'Negociació', tt: "Reflexió analítica sobre els biaixos comercials, ideològics o de disseny dels sistemes de recomanació, avaluant críticament l'entorn." },
+                        { t: "Valoració crítica", s: 'Mirada fora de ruta', th: 'Negociació', tt: "Reflexió analítica sobre els biaixos comercials, ideològics o de disseny dels sistemes de recomanació, avaluant críticament l'entorn." },
                         { t: "Elecció autònoma", s: 'Aventura per lliure', th: 'Elecció conscient', tt: "Exercici ple de l'agència, caracteritzat per l'evasió de la curadoria automatitzada i la recerca independent de continguts culturals." }
                     ],
                     tips: [
@@ -701,7 +708,7 @@
                         text: "Amb quina freqüència explores gèneres molt allunyats de les teves preferències habituals a {plataforma}?",
                         options: [
                             { text: "Mai, prefereixo confiar en la zona de confort que m'ofereix l'inici.", value: 1 },
-                            { text: "Rarament, només ho faig si el sistema m'ho recomana directament.", value: 2 },
+                            { text: "Raramente, només ho faig si el sistema m'ho recomana directament.", value: 2 },
                             { text: "Freqüentment, utilitzant el cercador manual per trobar varietat.", value: 3 },
                             { text: "Sempre, faig una cerca sistemàtica per accedir a una oferta cultural plural.", value: 6 }
                         ]
@@ -767,7 +774,7 @@
                 results: {
                     profPass: "Passenger Person",
                     profNav: "Navigator Person",
-                    profSob: "Sovereign Person",
+                    profSob: "Sovereign<br>Person",
                     descPass: `On your journey through <strong>{plataforma}</strong> you prefer to book the "all-inclusive" package from the algorithmic travel agency. You fully trust the preset itinerary, letting yourself be carried along the most commercial routes and comfortably visiting the places the platform organizes for you, without leaving the marked path.`,
                     descNav: `Your time in <strong>{plataforma}</strong> is like joining a "free tour" with a good travel guide in your pocket. You take advantage of the organized circuits the system offers, but sometimes you decide to detour down an alley that catches your eye, ask locals, and keep a balance between the tourist route and your own curiosity.`,
                     descSob: `Your spirit is completely free and adventure-loving! In <strong>{plataforma}</strong> you flee from mass tourism and move "on your own", charting your own map. You look for hidden gems outside the commercial circuit, always question the tourist brochure they try to sell you, and, if the landscape doesn't convince you, you pack your bags for new horizons.`,
@@ -972,6 +979,244 @@
                         ]
                     }
                 ]
+            },
+            gl: {
+                ui: {
+                    title: "O Compás Algorítmico",
+                    introText: "Dámosche a benvida a esta expedición dixital! Nun mar de recomendacións automáticas, cada persoa traza a súa propia ruta. Déixaste levar pola corrente ou tomas o temón das túas decisións?",
+                    startBtn: "Iniciar a aventura",
+                    disclaimer1: "Esta aplicación ten un carácter lúdico e non é unha ferramenta metodoloxicamente contrastada. Desenvolveuse co único propósito de mellorar a alfabetización algorítmica das persoas usuarias.",
+                    disclaimer2: "As respostas facilitadas son totalmente anónimas e ALCOM non almacena ningún dato durante a navegación.",
+                    step1: "Paso 1",
+                    destTitle: "Elixe o teu destino de exploración",
+                    destSub: "En que territorio dixital imos penetrar hoxe?",
+                    unexplored: "Territorio inexplorado",
+                    placeName: "Nome do lugar",
+                    placePlaceholder: "Ex: Twitch, Filmin...",
+                    ecoType: "Tipo de ecosistema",
+                    ecoSelect: "Selecciona o seu tipo...",
+                    ecoSocial: "Rede Social (muros, vídeos curtos, creadores...)",
+                    ecoStreaming: "Streaming (películas, series, catálogos...)",
+                    confirmRoute: "Confirmar ruta",
+                    alertFill: "Por favor, enche o nome e o tipo de plataforma para continuar a viaxe.",
+                    exploration: "Exploración",
+                    endExpedition: "Fin da expedición",
+                    profile: "Perfil:",
+                    exploreOther: "Explorar outro territorio",
+                    tipsBtn: "Consellos para mellorar a túa axencia",
+                    notebook: "Caderno de viaxe",
+                    understood: "Entendido, a explorar!",
+                    footer1: "Un desenvolvemento de Xavier Ribes para o proxecto ALCOM",
+                    footer2: "Percepción e xeración de coñecemento sobre os algoritmos de personalización nas plataformas dixitais de comunicación (PID2023-148682OA-I00)"
+                },
+                results: {
+                    profPass: "Persoa Pasaxeira",
+                    profNav: "Persoa Navegant",
+                    profSob: "Persoa<br>Soberana",
+                    descPass: `Na túa viaxe por <strong>{plataforma}</strong> prefires contratar o paquete de "todo incluído" da axencia turística algorítmica. Confías plenamente no itinerario preestablecido, deixándote levar polas rutas máis comerciais e visitando comodamente os lugares que a plataforma organiza para ti, sen saír da ruta marcada.`,
+                    descNav: `O teu paso por <strong>{plataforma}</strong> é como unirte a un "free tour" cunha boa guía de viaxe no peto. Aproveitas os circuítos organizados que che ofrece o sistema, pero ás veces decides desviarche por un canellón que che chama a atención, preguntas á xente local e mantés un equilibrio entre a ruta turística e a túa propia curiosidade.`,
+                    descSob: `O teu espírito é totalmente libre e amante da aventura! En <strong>{plataforma}</strong> foxes das viaxes masificadas e móveste "por libre", trazando o teu propio mapa. Buscas xoias ocultas fóra do circuíto comercial, cuestionas sempre o folleto turístico que che tentan vender e, se a paisaxe non che convence, fas as maletas cara a novos horizontes.`,
+                    labels: [
+                        { t: "Submisión algorítmica", s: 'Viaxe "todo incluído"', th: 'Sometemento', tt: "Aceptación acrítica das recomendacións automatizadas, delegando por completo a selección de contidos ao sistema nun estado de pasividade operativa." },
+                        { t: "Aceptación selectiva", s: 'Excursións de axencia', th: 'Interacción', tt: "Interacción superficial que acepta as suxestións do sistema, aplicando filtros mínimos para adaptar levemente o modelo algorítmico ao perfil." },
+                        { t: "Exploración guiada", s: 'Viaxe con guía', th: 'Resistencia', tt: "Uso instrumental das ferramentas nativas da plataforma para dirixir activamente as recomendacións e negociar os resultados do algoritmo." },
+                        { t: "Contraste externo", s: 'Consulta de mapas', th: 'Evasión', tt: "Comprobación da validez das recomendacións mediante a consulta activa de fontes de información e referencias alleas ao ecosistema pechado." },
+                        { t: "Valoración crítica", s: 'Mirada fóra de ruta', th: 'Negociación', tt: "Reflexión analítica sobre os rumbos comerciais, ideolóxicos ou de deseño dos sistemas de recomendación, avaliando criticamente a contorna." },
+                        { t: "Elección autónoma", s: 'Aventura por libre', th: 'Elección consciente', tt: "Exercicio pleno da axencia, caracterizado pola evasión da curadoría automatizada e a busca independente de contidos culturais." }
+                    ],
+                    tips: [
+                        { t: "Seguinte destino: Excursións personalizadas", p1: "Gozaches da viaxe con todo incluído, pero é hora de comezar a elixir as túas propias rutas.", p2: "<strong>💡 O consello da expedición:</strong> Usa os botóns de 'Gústame' ou 'Non me interesa' activamente. Obriga á axencia turística algorítmica a escoitar as túas preferencias en lugar de aceptar pasivamente o seu menú do día." },
+                        { t: "Seguinte destino: Tomar o temón", p1: "Xa filtras o que non che gusta, é un gran paso! Agora tócache tomar a iniciativa.", p2: "<strong>💡 O consello da expedición:</strong> En lugar de esperar a que a pantalla che ofreza contido, usa o buscador. Busca activamente creadores, xéneros ou temáticas concretas. Convértete na persoa que guía a expedición." },
+                        { t: "Seguinte destino: Contrastar os mapas", p1: "Sabes moverte pola plataforma e guiar a túa ruta, pero ás veces os mapas oficiais ocultan información.", p2: "<strong>💡 O consello da expedición:</strong> Cando a plataforma che recomende algo con moita insistencia, sal da aplicación e busca opinións en webs externas, foros ou comunidades. Non queden só coa versión oficial da axencia." },
+                        { t: "Seguinte destino: Cuestionar a axencia", p1: "Xa contrastas a información fóra, agora toca afiar a túa mirada crítica cara a quen organiza a viaxe.", p2: "<strong>💡 O consello da expedición:</strong> Pregúntate sempre <strong>por que</strong> che recomendan algo. É unha campaña pagada? É contido deseñado para reterche horas na pantalla? Recoñecer os intereses comerciais detrás da recomendación farache imparable." },
+                        { t: "Seguinte destino: A aventura total", p1: "Tes unha gran capacidade crítica. O último paso é a independencia total.", p2: "<strong>💡 O consello da expedición:</strong> Dedica tempo a descubrir cultura e información completamente fóra das grandes plataformas comerciais. Apoia espazos independentes, fanzines, blogs ou catálogos alternativos. Crea as túas propias rutas inexploradas!" },
+                        { t: "Es soberanía pura!", p1: "Alcanzaches o nivel máximo de axencia nesta expedición.", p2: "<strong>💡 O consello da expedición:</strong> Segue mantendo esta gran autonomía e comparte os teus descubrimentos (os teus 'mapas secretos') coa túa comunidade. Axuda a outras persoas a saír das súas propias rutas comerciais e ensínalle a explorar con liberdade." }
+                    ]
+                },
+                socialQuestions: [
+                    {
+                        text: "Ao abrir {plataforma} sen un obxectivo claro, que adoitas facer?",
+                        options: [
+                            { text: "Ver o primeiro que aparece na miña pantalla principal ou feed.", value: 1 },
+                            { text: "Esvarar e darlle 'gústame' ao que me atrae para que o algoritmo aprenda.", value: 2 },
+                            { text: "Usar o buscador ou etiquetas (hashtags) para atopar algo específico.", value: 3 },
+                            { text: "Ir directamente a perfís ou canles que a miña comunidade me recomendou.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Como decides se unha publicación ou vídeo en {plataforma} paga a pena?",
+                        options: [
+                            { text: "Deixo que se reproduza; confío cegamente no algoritmo.", value: 1 },
+                            { text: "Valoro se se parece a outras cousas que xa consumín neste espazo.", value: 2 },
+                            { text: "Saio da app para buscar máis información noutras fontes.", value: 4 },
+                            { text: "Analizo por que mo recomendan e se existen rumbos comerciais ou de viralidade.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Que fas cando o sistema de {plataforma} che mostra contidos nesgados ou que non che gustan?",
+                        options: [
+                            { text: "Sigo consumindo o contido pasivamente e esvaro rápido.", value: 1 },
+                            { text: "Uso a opción de 'non me interesa' para tentar educar o sistema.", value: 3 },
+                            { text: "Reflexiono sobre os rumbos da plataforma e o seu impacto social.", value: 5 },
+                            { text: "Deixo de usar a aplicación e busco espazos informativos máis diversos.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Ata que punto consideras que controlas o que consomes en {plataforma}?",
+                        options: [
+                            { text: "Nada, a plataforma decide o fluxo e resúltame cómodo.", value: 1 },
+                            { text: "Algo, porque modelo o meu perfil mediante as miñas interaccións diarias.", value: 2 },
+                            { text: "Bastante, porque entro con propósitos claros de busca.", value: 3 },
+                            { text: "Total, son consciente de cando entrar e evito o seu sistema automatizado.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Se queres descubrir novas contas ou tendencias en {plataforma}, como o fas?",
+                        options: [
+                            { text: "Deixo que a sección de suxestións ou 'Para ti' me guíe.", value: 1 },
+                            { text: "Reviso listas, canles recomendadas ou etiquetas dos meus gustos.", value: 3 },
+                            { text: "Pregunto a amizades ou consulto medios fóra da rede.", value: 4 },
+                            { text: "Investigo de forma independente, fóra das tendencias dominantes.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Que opinión che merecen os contidos 'Virais' ou 'Tendencias' de {plataforma}?",
+                        options: [
+                            { text: "Son a miña guía principal para estar ao día do que ocorre.", value: 1 },
+                            { text: "Miroos se encaixan casualmente co que adoito ver.", value: 2 },
+                            { text: "Tómoos como referencia inicial, pero formo a miña propia opinión fóra.", value: 4 },
+                            { text: "Evítoos porque adoitan ser froito de intereses promocionais.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Con que frecuencia buscas contido que rompa coa túa 'burbulla' ou preferencias habituais en {plataforma}?",
+                        options: [
+                            { text: "Nunca, sigo o fluxo constante que me dá a plataforma.", value: 1 },
+                            { text: "Raramente, resúltame máis cómoda a miña contorna familiar de intereses.", value: 2 },
+                            { text: "Frecuentemente, busco de forma activa temáticas distintas usando o buscador.", value: 3 },
+                            { text: "Sempre, fago buscas sistemáticas para manter unha visión plural.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Ao interactuar (gardar, compartir, comentar) en {plataforma}, cal é a túa motivación principal?",
+                        options: [
+                            { text: "Fágoo por inercia, sen pensalo moito.", value: 1 },
+                            { text: "Para que a interface me siga mostrando publicacións similares.", value: 2 },
+                            { text: "Tento non interactuar demasiado para protexer os meus datos persoais.", value: 5 },
+                            { text: "Para dar apoio xenuíno a quen crea contido, sen importar o algoritmo.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Se pasas demasiado tempo facendo 'scroll' infinito en {plataforma}, como reaccionas?",
+                        options: [
+                            { text: "Sigo mirando, cústame saír do piloto automático.", value: 1 },
+                            { text: "Tento centrarme e buscar algunha temática máis concreta e útil.", value: 3 },
+                            { text: "Saio para contrastar na internet algo interesante que vin.", value: 4 },
+                            { text: "Desconéctome intencionadamente para realizar actividades fóra das pantallas.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Como describirías a túa relación ideal con {plataforma}?",
+                        options: [
+                            { text: "Que me ofreza entretemento constante sen requirir esforzo pola miña banda.", value: 1 },
+                            { text: "Que me permita adaptar o meu espazo mediante os meus clics e 'gústame' diarios.", value: 2 },
+                            { text: "Que sexa unha ferramenta de busca onde eu tomo a iniciativa.", value: 3 },
+                            { text: "Que sexa un recurso puntual, mantendo eu o control soberano do meu tempo.", value: 6 }
+                        ]
+                    }
+                ],
+                streamingQuestions: [
+                    {
+                        text: "Ao abrir {plataforma} sen saber que elixir, que adoitas facer?",
+                        options: [
+                            { text: "Pór a primeira recomendación destacada ou de reprodución automática.", value: 1 },
+                            { text: "Navegar polas filas de 'Porque viches...' ou categorías similares.", value: 2 },
+                            { text: "Usar o buscador para atopar un título, artista ou xénero concreto.", value: 3 },
+                            { text: "Buscar unha obra que as miñas amizades ou a crítica me recomendaron previamente.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Como decides se un contido suxerido por {plataforma} merece o teu tempo?",
+                        options: [
+                            { text: "Comezo a velo ou escoitalo directamente sen dubidar.", value: 1 },
+                            { text: "Fíxome na porcentaxe de afinidade ou se se parece ao meu historial.", value: 2 },
+                            { text: "Busco críticas ou puntuacións en webs externas (ex. FilmAffinity, IMDB).", value: 4 },
+                            { text: "Pregúntome se é unha promoción da propia plataforma antes de elixir.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Que fas se {plataforma} insísteche con obras moi comerciais ou que non encaixan contigo?",
+                        options: [
+                            { text: "Acáboas consumindo por inercia ou comodidade.", value: 1 },
+                            { text: "Uso os botóns de valoración ou borro o historial para tentar educala.", value: 3 },
+                            { text: "Reflexiono criticamente sobre a falta de diversidade cultural do catálogo.", value: 5 },
+                            { text: "Pecho a aplicación e opto por catálogos alternativos ou formatos independentes.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Ata que punto sentes que controlas o teu catálogo de recomendacións en {plataforma}?",
+                        options: [
+                            { text: "Nada, limítome ao que a portada me pon diante.", value: 1 },
+                            { text: "Algo, porque o vou moldeando ao engadir obras ás miñas listas ou favoritos.", value: 2 },
+                            { text: "Bastante, porque busco activamente saltándome a páxina principal.", value: 3 },
+                            { text: "Total, ignoro as suxestións automáticas e vou directo ao que quero consumir.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Para descubrir xoias ocultas ou obras menos coñecidas en {plataforma}, que fas?",
+                        options: [
+                            { text: "Deixo que a reprodución automática me sorprenda.", value: 1 },
+                            { text: "Exploro subcategorías ou listas temáticas específicas suxeridas na interface.", value: 3 },
+                            { text: "Consulto foros, revistas ou pregunto a persoas fóra do ecosistema da app.", value: 4 },
+                            { text: "Investigo en bases de datos independentes para atopar contido de nicho.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Que opinión che merecen as listas de 'Top 10' ou 'Máis populares' en {plataforma}?",
+                        options: [
+                            { text: "Son a opción máis segura e rápida para elixir que consumir hoxe.", value: 1 },
+                            { text: "Revísoas por curiosidade, pero só escollo o que encaixa nos meus gustos.", value: 2 },
+                            { text: "Úsoas como referencia, pero sempre valido a súa calidade noutros sitios.", value: 4 },
+                            { text: "Adoito evitalas activamente porque adoitan beneficiar ás grandes producións.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Con que frecuencia exploras xéneros moi afastados das túas preferencias habituais en {plataforma}?",
+                        options: [
+                            { text: "Nunca, prefiro confiar na zona de confort que me ofrece o inicio.", value: 1 },
+                            { text: "Raramente, só o fago se o sistema mo recomenda directamente.", value: 2 },
+                            { text: "Frecuentemente, usando o buscador manual para atopar variedade.", value: 3 },
+                            { text: "Sempre, fago unha busca sistemática para acceder a unha oferta cultural plural.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Ao engadir contido a 'A miña lista' ou dar 'Gústame' en {plataforma}, que buscas principalmente?",
+                        options: [
+                            { text: "Fágoo por automatismo, e moitas veces non o volvo a mirar.", value: 1 },
+                            { text: "Fágoo para afinar o algoritmo e que me suxira cousas similares no futuro.", value: 2 },
+                            { text: "Evito facelo moito para non reducir a diversidade do que me mostran.", value: 5 },
+                            { text: "Para manter un arquivo persoal de obras que realmente valoro como arte.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Se pasas demasiado tempo navegando polo menú de {plataforma} sen decidirche, que fas?",
+                        options: [
+                            { text: "Acabo pondo calquera cousa suxerida na portada para non pensar máis.", value: 1 },
+                            { text: "Afino a busca utilizando categorías, directores ou artistas específicos.", value: 3 },
+                            { text: "Consulto algunha web externa de recensións para saír de dúbidas e elixir.", value: 4 },
+                            { text: "Apago la pantalla e decido facer outra actividade allea ao dixital.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Cal sería a túa experiencia ideal ao usar {plataforma}?",
+                        options: [
+                            { text: "Que acerte sempre e póñame contido ideal sen ter que navegar.", value: 1 },
+                            { text: "Que aprenda dos meus hábitos para crear unha contorna perfectamente personalizada.", value: 2 },
+                            { text: "Que funcione como un gran arquivo neutral onde eu busco activamente.", value: 3 },
+                            { text: "Que sexa só un provedor de acceso, mantendo o meu criterio libre e soberano.", value: 6 }
+                        ]
+                    }
+                ]
             }
         };
 
@@ -1090,12 +1335,10 @@
                 let gridHtml = '';
                 
                 platformList.forEach(p => {
-                    // Traduïm només "Otra" al diccionari correcte
-                    let pName = p === 'Otra' ? t('ui.unexplored').split(' ')[0] : p; 
                     gridHtml += `
                         <button onclick="selectPlatform('${p}')" class="adventure-btn group">
                             <div class="transform group-hover:scale-110 transition-transform">${getPlatformLogo(p)}</div>
-                            <span class="mt-3 text-sm font-bold text-slate-700">${pName}</span>
+                            <span class="mt-3 text-sm font-bold text-slate-700">${p}</span>
                         </button>
                     `;
                 });
@@ -1111,27 +1354,6 @@
                         <div class="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 mb-6" id="platformGrid">
                             ${gridHtml}
                         </div>
-
-                        <div id="otherPlatformDiv" class="hidden mt-6 bg-slate-50 p-6 rounded-2xl border border-slate-200 fade-in text-left">
-                            <h3 class="font-bold text-slate-800 mb-4">${t('ui.unexplored')}</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-600 mb-1">${t('ui.placeName')}</label>
-                                    <input type="text" id="otherPlatformName" placeholder="${t('ui.placePlaceholder')}" class="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-600 mb-1">${t('ui.ecoType')}</label>
-                                    <select id="otherPlatformType" class="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-500 bg-white">
-                                        <option value="" disabled selected>${t('ui.ecoSelect')}</option>
-                                        <option value="social">${t('ui.ecoSocial')}</option>
-                                        <option value="streaming">${t('ui.ecoStreaming')}</option>
-                                    </select>
-                                </div>
-                                <div class="pt-2 text-right">
-                                    <button onclick="confirmOtherPlatform()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-xl transition-colors">${t('ui.confirmRoute')}</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 `;
             }
@@ -1140,29 +1362,9 @@
         }
 
         function selectPlatform(platformStr) {
-            if (platformStr === 'Otra') {
-                document.getElementById('platformGrid').classList.add('hidden');
-                document.getElementById('otherPlatformDiv').classList.remove('hidden');
-            } else {
-                participantData.platformNameRaw = platformStr;
-                const socialPlatforms = ['Instagram', 'TikTok', 'YouTube'];
-                participantData.platformType = socialPlatforms.includes(platformStr) ? 'social' : 'streaming';
-                
-                activeQuestions = participantData.platformType === 'social' ? i18n[currentLang].socialQuestions : i18n[currentLang].streamingQuestions;
-                startQuiz();
-            }
-        }
-
-        function confirmOtherPlatform() {
-            const nameInput = document.getElementById('otherPlatformName').value.trim();
-            const typeInput = document.getElementById('otherPlatformType').value;
-            
-            if(!nameInput || !typeInput) {
-                alert(t('ui.alertFill'));
-                return;
-            }
-            participantData.platformNameRaw = nameInput;
-            participantData.platformType = typeInput;
+            participantData.platformNameRaw = platformStr;
+            const socialPlatforms = ['Instagram', 'TikTok', 'YouTube'];
+            participantData.platformType = socialPlatforms.includes(platformStr) ? 'social' : 'streaming';
             
             activeQuestions = participantData.platformType === 'social' ? i18n[currentLang].socialQuestions : i18n[currentLang].streamingQuestions;
             startQuiz();
@@ -1270,12 +1472,15 @@
 
             const needleAngle = ((average - 1) * 60);
             const logo = getPlatformLogo(participantData.platformNameRaw);
+            
+            // Suprimim el salt de línia al títol principal
+            const safeProfileName = profileName.replace('<br>', ' ');
 
             appContainer.innerHTML = `
                 <div class="p-8 fade-in text-center flex flex-col h-full">
                     <div class="mb-4 flex justify-center">${logo}</div>
                     <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase block mb-1">${t('ui.endExpedition')}</span>
-                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">${t('ui.profile')} <span class="${profileColor}">${profileName}</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">${t('ui.profile')} <span class="${profileColor}">${safeProfileName}</span></h2>
                     
                     <div class="max-w-md mx-auto p-4 bg-slate-50 rounded-xl mb-4">
                         <p class="text-slate-600">${formatText(profileDescription)}</p>
