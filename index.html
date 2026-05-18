@@ -7,20 +7,20 @@
     <!-- Carreguem Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estils personalitzats i transicions */
+        /* Estilos personalizados y transiciones */
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* * ESTRUCTURA DE CAPES (Z-INDEX)
-         * 5: Marques d'aigua (PASAJERA, NAVEGANTE, SOBERANA)
-         * 10: Centre de la brúixola
-         * 15: Nodes negres (Punts)
-         * 20: Etiquetes blanques (.compass-label)
-         * 30: Agulla (.compass-needle) -> Per sobre de les blanques
-         * 40: Tooltips negres acadèmics (.tooltip) -> Per sobre de l'agulla
-         * 100: Finestra Modal i Selector d'Idiomes
+        /* * ESTRUCTURA DE CAPAS (Z-INDEX)
+         * 5: Marcas de agua (PASAJERA, NAVEGANTE, SOBERANA)
+         * 10: Centro de la brújula
+         * 15: Nodos negros (Puntos)
+         * 20: Etiquetas blancas (.compass-label)
+         * 30: Aguja (.compass-needle) -> Por encima de las blancas
+         * 40: Tooltips negros académicos (.tooltip) -> Por encima de la aguja
+         * 100: Ventana Modal y Selector de Idiomas
          */
 
         .compass-container {
@@ -214,6 +214,9 @@
         <button onclick="setLang('gl')" id="btn-gl" class="lang-btn flex items-center justify-center bg-white p-2 rounded-full shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors" title="Galego">
             <svg class="w-6 h-6 rounded-full overflow-hidden border border-slate-300" viewBox="0 0 60 30" preserveAspectRatio="none"><rect width="60" height="30" fill="#fff"/><polygon points="0,0 20,0 60,30 40,30" fill="#00b3e3" /></svg>
         </button>
+        <button onclick="setLang('eu')" id="btn-eu" class="lang-btn flex items-center justify-center bg-white p-2 rounded-full shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors" title="Euskara">
+            <svg class="w-6 h-6 rounded-full overflow-hidden border border-slate-300" viewBox="0 0 60 30" preserveAspectRatio="none"><rect width="60" height="30" fill="#DA291C"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#009A44" stroke-width="6"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#FFF" stroke-width="6"/></svg>
+        </button>
     </div>
 
     <!-- Embolcall per mantenir el footer al final -->
@@ -232,8 +235,8 @@
     </div>
 
     <script>
-        // Llista de plataformes i els seus icones SVG
-        const platformList = ['Instagram', 'TikTok', 'YouTube', 'Netflix', 'Prime Video', 'Disney+', 'HBO', 'Spotify', 'Apple TV'];
+        // Llista de plataformes i els seus icones SVG (Apple TV eliminat, restaurat 'Otra')
+        const platformList = ['Instagram', 'TikTok', 'YouTube', 'Netflix', 'Prime Video', 'Disney+', 'HBO', 'Spotify', 'Otra'];
 
         function getPlatformLogo(platformName) {
             const name = platformName.toLowerCase();
@@ -255,8 +258,6 @@
                 return `<div class="${baseClasses} rounded-full bg-blue-800 text-white flex items-center justify-center font-bold text-xs">D+</div>`;
             } else if (name.includes('hbo')) {
                 return `<div class="${baseClasses} rounded-full bg-purple-900 text-white flex items-center justify-center font-bold text-xs" style="font-family: serif;">HBO</div>`;
-            } else if (name.includes('apple')) {
-                return `<div class="${baseClasses} rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-[10px]">tv</div>`;
             }
             return `<svg class="${baseClasses} text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>`;
         }
@@ -273,7 +274,8 @@
                     step1: "Paso 1",
                     destTitle: "Elige tu destino de exploración",
                     destSub: "¿En qué territorio digital vamos a adentrarnos hoy?",
-                    unexplored: "Apple TV",
+                    other: "Otros territorios",
+                    unexplored: "Territorio inexplorado",
                     placeName: "Nombre del lugar",
                     placePlaceholder: "Ej: Twitch, Filmin...",
                     ecoType: "Tipo de ecosistema",
@@ -511,7 +513,8 @@
                     step1: "Step 1",
                     destTitle: "Choose your exploration destination",
                     destSub: "Which digital territory are we venturing into today?",
-                    unexplored: "Apple TV",
+                    other: "Other territories",
+                    unexplored: "Unexplored territory",
                     placeName: "Place name",
                     placePlaceholder: "E.g., Twitch, Filmin...",
                     ecoType: "Ecosystem type",
@@ -749,7 +752,8 @@
                     step1: "Pas 1",
                     destTitle: "Tria el teu destí d'exploració",
                     destSub: "En quin territori digital ens endinsarem avui?",
-                    unexplored: "Apple TV",
+                    other: "Altres territoris",
+                    unexplored: "Territori inexplorat",
                     placeName: "Nom del lloc",
                     placePlaceholder: "Ex: Twitch, Filmin...",
                     ecoType: "Tipus d'ecosistema",
@@ -943,7 +947,7 @@
                         text: "Amb quina freqüència explores gèneres molt allunyats de les teves preferències habituals a {plataforma}?",
                         options: [
                             { text: "Mai, prefereixo confiar en la zona de confort que m'ofereix l'inici.", value: 1 },
-                            { text: "Raramente, només ho faig si el sistema m'ho recomana directament.", value: 2 },
+                            { text: "Rarament, només ho faig si el sistema m'ho recomana directament.", value: 2 },
                             { text: "Freqüentment, utilitzant el cercador manual per trobar varietat.", value: 3 },
                             { text: "Sempre, faig una cerca sistemàtica per accedir a una oferta cultural plural.", value: 6 }
                         ]
@@ -953,7 +957,7 @@
                         options: [
                             { text: "Ho faig per automatisme, i moltes vegades no ho torno a mirar.", value: 1 },
                             { text: "Ho faig per afinar l'algorisme i que em suggereixi coses similars en el futur.", value: 2 },
-                            { text: "Evito fer-ho molt per no reduir la diversitat del que me mostren.", value: 5 },
+                            { text: "Evito fer-ho molt per no reduir la diversitat del que em mostren.", value: 5 },
                             { text: "Per mantenir un arxiu personal d'obres que realment valoro com a art.", value: 6 }
                         ]
                     },
@@ -987,12 +991,13 @@
                     step1: "Paso 1",
                     destTitle: "Elixe o teu destino de exploración",
                     destSub: "En que territorio dixital imos penetrar hoxe?",
-                    unexplored: "Apple TV",
+                    other: "Outros territorios",
+                    unexplored: "Territorio inexplorado",
                     placeName: "Nome do lugar",
                     placePlaceholder: "Ex: Twitch, Filmin...",
                     ecoType: "Tipo de ecosistema",
                     ecoSelect: "Selecciona o seu tipo...",
-                    ecoSocial: "Rede Social (muros, vídeos curtos, creadores...)",
+                    ecoSocial: "Rede Social (muros, vídeos curtos, creadors...)",
                     ecoStreaming: "Streaming (películas, series, catálogos...)",
                     confirmRoute: "Confirmar ruta",
                     alertFill: "Por favor, enche o nome e o tipo de plataforma para continuar a viaxe.",
@@ -1008,7 +1013,7 @@
                 },
                 results: {
                     profPass: "Persoa Pasaxeira",
-                    profNav: "Persoa Navegant",
+                    profNav: "Persoa Navegante",
                     profSob: "Persoa<br>Soberana",
                     descPass: `Na túa viaxe por <strong>{plataforma}</strong> prefires contratar o paquete de "todo incluído" da axencia turística algorítmica. Confías plenamente no itinerario preestablecido, deixándote levar polas rutas máis comerciais e visitando comodamente os lugares que a plataforma organiza para ti, sen saír da ruta marcada.`,
                     descNav: `O teu paso por <strong>{plataforma}</strong> é como unirte a un "free tour" cunha boa guía de viaxe no peto. Aproveitas os circuítos organizados que che ofrece o sistema, pero ás veces decides desviarche por un canellón que che chama a atención, preguntas á xente local e mantés un equilibrio entre a ruta turística e a túa propia curiosidade.`,
@@ -1027,7 +1032,7 @@
                         { t: "Seguinte destino: Contrastar os mapas", p1: "Sabes moverte pola plataforma e guiar a túa ruta, pero ás veces os mapas oficiais ocultan información.", p2: "<strong>💡 O consello da expedición:</strong> Cando a plataforma che recomende algo con moita insistencia, sal da aplicación e busca opinións en webs externas, foros ou comunidades. Non queden só coa versión oficial da axencia." },
                         { t: "Seguinte destino: Cuestionar a axencia", p1: "Xa contrastas a información fóra, agora toca afiar a túa mirada crítica cara a quen organiza a viaxe.", p2: "<strong>💡 O consello da expedición:</strong> Pregúntate sempre <strong>por que</strong> che recomendan algo. É unha campaña pagada? É contido deseñado para reterche horas na pantalla? Recoñecer os intereses comerciais detrás da recomendación farache imparable." },
                         { t: "Seguinte destino: A aventura total", p1: "Tes unha gran capacidade crítica. O último paso é a independencia total.", p2: "<strong>💡 O consello da expedición:</strong> Dedica tempo a descubrir cultura e información completamente fóra das grandes plataformas comerciais. Apoia espazos independentes, fanzines, blogs ou catálogos alternativos. Crea as túas propias rutas inexploradas!" },
-                        { t: "Es soberanía pura!", p1: "Alcanzaches o nivel máximo de axencia nesta expedición.", p2: "<strong>💡 O consello da expedición:</strong> Segue mantendo esta gran autonomía e comparte os teus descubrimentos (os teus 'mapas secretos') coa túa comunidade. Axuda a outras persoas a saír das súas propias rutas comerciais e ensínalle a explorar con liberdade." }
+                        { t: "Es soberanía pura!", p1: "Alcanzaches o nivel máximo de axencia nesta expedición.", p2: "<strong>💡 O consello da expedición:</strong> Segue mantendo esta gran autonomía e comparte os teus descubrimentos (os teus 'mapes secretos') coa túa comunidade. Axuda a outras persoas a saír das súas propias rutas comerciais e ensínalle a explorar con liberdade." }
                     ]
                 },
                 socialQuestions: [
@@ -1142,7 +1147,7 @@
                         ]
                     },
                     {
-                        text: "Que fas se {plataforma} insísteche con obras moi comerciais ou que non encaixen contigo?",
+                        text: "Que fas se {plataforma} insísteche con obras moi comerciais ou que non encaixan contigo?",
                         options: [
                             { text: "Acáboas consumindo por inercia ou comodidade.", value: 1 },
                             { text: "Uso os botóns de valoración ou borro o historial para tentar educala.", value: 3 },
@@ -1211,6 +1216,245 @@
                             { text: "Que aprenda dos meus hábitos para crear unha contorna perfectamente personalizada.", value: 2 },
                             { text: "Que funcione como un gran arquivo neutral onde eu busco activamente.", value: 3 },
                             { text: "Que sexa só un provedor de acceso, mantendo o meu criterio libre e soberano.", value: 6 }
+                        ]
+                    }
+                ]
+            },
+            eu: {
+                ui: {
+                    title: "Orratz Algoritmikoa",
+                    introText: "Ongi etorri espedizio digital honetara! Gomendio automatikoen itsasoan, norberak bere bidea zehazten du. Korronteak eramaten uzten zara ala erabakien gidaritza hartzen duzu?",
+                    startBtn: "Hasi abentura",
+                    disclaimer1: "Aplikazio honek jolas-izaera du eta ez da metodologikoki kontrastatutako tresna bat. Erabiltzaileen alfabetatze algoritmikoa hobetzeko helburu bakarrarekin garatu da.",
+                    disclaimer2: "Emandako erantzunak guztiz anonimoak dira eta ALCOMek ez du inolako daturik gordetzen nabigazioan zehar.",
+                    step1: "1. urratsa",
+                    destTitle: "Aukeratu zure esplorazio-helburua",
+                    destSub: "Zer lurralde digitaletan sartuko gara gaur?",
+                    other: "Beste lurralde batzuk",
+                    unexplored: "Arakatu gabeko lurraldea",
+                    placeName: "Tokiaren izena",
+                    placePlaceholder: "Adibidez: Twitch, Filmin...",
+                    ecoType: "Ekosistema mota",
+                    ecoSelect: "Hautatu mota...",
+                    ecoSocial: "Sare soziala (hormak, bideo laburrak, sortzaileak...)",
+                    ecoStreaming: "Streaming-a (filmak, serieak, katalogoak...)",
+                    confirmRoute: "Berretsi bidea",
+                    alertFill: "Mesedez, bete plataformaren izena eta mota bidaiarekin jarraitzeko.",
+                    exploration: "Esplorazioa",
+                    endExpedition: "Espedizioaren amaiera",
+                    profile: "Profila:",
+                    exploreOther: "Esploratu beste lurralde bat",
+                    tipsBtn: "Zure agentzia hobetzeko aholkuak",
+                    notebook: "Bidaia-koadernoa",
+                    understood: "Ados, esploratzera!",
+                    footer1: "Xavier Ribesek ALCOM proiekturako egindako garapena",
+                    footer2: "Komunikazio-plataforma digitaletako pertsonalizazio-algoritmoei buruzko ezagutzaren hautematea eta sorrera (PID2023-148682OA-I00)"
+                },
+                results: {
+                    profPass: "Pertsona Bidaiaria",
+                    profNav: "Pertsona Nabigatzailea",
+                    profSob: "Pertsona<br>Subiranoa",
+                    descPass: `<strong>{plataforma}</strong> bidezko zure bidaian, nahiago duzu agentzia turistiko algoritmikoaren "guztia barne" paketea kontratatu. Diseinatutako ibilbidean konfiantza osoa duzu, ibilbide komertzialenek eraman zaitzaten utziz eta plataformak zurezat antolatzen dituen lekuak eroso bisitatuz, markatutako bidetik irten gabe.`,
+                    descNav: `Zure pasoa <strong>{plataforma}</strong> bidez bidaia-gida on bat poltsikoan duzula "free tour" batean parte hartzea bezalakoa da. Sistemak eskaintzen dizkizun zirkuitu antolatuez baliatzen zara, baina batzuetan arreta ematen dizun kalezulo batetik desbideratzea erabakitzen duzu, bertakoei galdetzen diezu eta ibilbide turistikoaren eta zure jakin-minaren arteko oreka mantentzen duzu.`,
+                    descSob: `Zure espiritua guztiz librea da eta abenturazalea! <strong>{plataforma}</strong> plataforman, bidaia jendetsuetatik ihes egiten duzu eta "zure kontura" mugitzen zara, zure mapa propioa zehaztuz. Zirkuitu komertzialetik kanpoko altxor ezkutuak bilatzen dituzu, saldu nahi dizuten bidaia-liburuxka zalantzan jartzen duzu beti, eta paisaiak konbentzitzen ez bazaitu, maletak egiten dituzu zeruertz berrietarantz.`,
+                    labels: [
+                        { t: "Mendekotasun algoritmikoa", s: '"Guztia barne" bidaia', th: "Mendekotasuna", tt: "Gomendio automatizatuen onarpen akritikoa, edukien hautaketa sistemaren esku utziz erabat, pasibotasun operatiboan." },
+                        { t: "Onarpen selektiboa", s: "Agentzia-irteerak", th: "Elkarrekintza", tt: "Sistemaren iradokizunak onartzen dituen azaleko elkarrekintza, profilari algoritmo-eredua apur bat moldatzeko gutxieneko iragazkiak ezarriz." },
+                        { t: "Esplorazio gidatua", s: "Gidatutako bidaia", th: "Erresistentzia", tt: "Plataformako berezko tresnen erabilera instrumentala gomendioak aktiboki bideratzeko eta algoritmoaren emaitzak negoziatzeko." },
+                        { t: "Kanpoko kontrastea", s: "Mapen kontsulta", th: "Ihesbidea", tt: "Gomendioen baliozkotasuna egiaztatzea, ekosistema itxitik kanpoko informazio-iturriak eta erreferentziak aktiboki kontsultatuz." },
+                        { t: "Balorazio kritikoa", s: "Ibilbidetik kanpoko begirada", th: "Negoziaketa", tt: "Gomendio-sistemen muga komertzial, ideologiko edo diseinu-mugen inguruko hausnarketa analitikoa, ingurunea modu kritikoan ebaluatuz." },
+                        { t: "Hautapen autonomoa", s: "Abentura librean", th: "Hautapen kontzientea", tt: "Agentziaren erabilera osoa, kurazio automatizatuari ihes egitea eta eduki kulturalen bilaketa independentea ezaugarri dituena." }
+                    ],
+                    tips: [
+                        { t: "Hurrengo helmuga: Irteera pertsonalizatuak", p1: "Gozatu duzu guztia barne bidaiarekin, baina bada garaia zure ibilbideak aukeratzen hasteko.", p2: "<strong>💡 Espedizioko aholkua:</strong> Erabili 'Atsegin dut' edo 'Ez zait interesatzen' botoiak aktiboki. Behartu bidaia-agentzia algoritmikoa zure lehentasunak entzuten, haien eguneroko menua pasiboki onartu beharrean." },
+                        { t: "Hurrengo helmuga: Lemari heltzea", p1: "Dagoeneko iragazten duzu gustatzen ez zaizuna, urrats handia da! Orain ekimena hartzea dagokizu.", p2: "<strong>💡 Espedizioko aholkua:</strong> Pantailak edukiak eskaintzeko zain egon beharrean, erabili bilatzailea. Bilatu aktiboki sortzaileak, xedeak edo gai zehatzak. Bihurtu zaitez espedizioa gidatzen duen pertsona." },
+                        { t: "Hurrengo helmuga: Mapak alderatzea", p1: "Badakizu plataforman mugitzen eta zure bidea bideratzen, baina batzuetan mapa ofizialek informazioa ezkutatzen dute.", p2: "<strong>💡 Espedizioko aholkua:</strong> Plataformak zerbait oso gogor gomendatzen dizunean, irten aplikaziotik eta bilatu iritziak kanpoko webguneetan, foroetan edo komunitateetan. Ez fidatu soilik agentziaren bertsio ofizialarekin." },
+                        { t: "Hurrengo helmuga: Agentzia zalantzan jartzea", p1: "Dagoeneko kanpoko informazioa alderatzen duzu, orain bidaia antolatzen duenarekiko begirada kritikoa zorrozteko unea da.", p2: "<strong>💡 Espedizioko aholkua:</strong> Galdetu zure buruari beti <strong>zergatik</strong> gomendatzen dizuten zerbait. Ordaindutako kanpaina bat al da? Pantailan orduak egoteko diseinatutako edukia al da? Gomendioaren atzean dauden interes komertzialak ezagutzeak geldiezin bihurtuko zaitu." },
+                        { t: "Hurrengo helmuga: Abentura osoa", p1: "Gaitasun kritiko handia duzu. Azken urratsa independentzia osoa da.", p2: "<strong>💡 Espedizioko aholkua:</strong> Eman denbora plataforma komertzial handietatik kanpo kultura eta informazioa ezagutzeko. Babestu espazio independenteak, fanzineak, blogak edo katalogo alternatiboak. Sortu zure esploratu gabeko ibilbideak!" },
+                        { t: "Subiranotasun hutsa zara!", p1: "Espedizio honetan agentzia-maila gorenera iritsi zara.", p2: "<strong>💡 Espedizioko aholkua:</strong> Jarraitu autonomia handi horri eusten eta partekatu zure aurkikuntzak (zure 'mapa sekretuak') zure komunitatearekin. Lagundu beste pertsona batzuei beren ibilbide komertzialetatik irten eta erakutsi iezaiezu modu librean esploratzen." }
+                    ]
+                },
+                socialQuestions: [
+                    {
+                        text: "Helburu argirik gabe {plataforma} irekitzean, zer egin ohi duzu?",
+                        options: [
+                            { text: "Nire pantaila nagusian edo feed-ean agertzen den lehenengo gauza ikusi.", value: 1 },
+                            { text: "Scroll egin eta gustuko dudanari 'atsegin dut' eman, algoritmoak ikas dezan.", value: 2 },
+                            { text: "Bilatzailea edo etiketak (hashtag-ak) erabili zerbait zehatza bilatzeko.", value: 3 },
+                            { text: "Nire komunitateak gomendatutako profil edo kanaletara joan zuzenean.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Nola erabakitzen duzu {plataforma} plataformako argitalpen edo bideo batek merezi duen?",
+                        options: [
+                            { text: "Erreproduzitzen uzten dut; algoritmoan itsu-itsuan konfiantza dut.", value: 1 },
+                            { text: "Espazio honetan jada kontsumitu ditudan beste gauza batzuen antzekoa den baloratzen dut.", value: 2 },
+                            { text: "Aplikaziotik irteten naiz beste iturri batzuetan informazio gehiago bilatzeko.", value: 4 },
+                            { text: "Niri zergatik gomendatzen didaten eta promozio edo bidezkotasun-alborapenik dagoen analizatzen dut.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Zer egiten duzu {plataforma} plataformak alboratutako edukiak edo gustuko ez dituzun gauzak erakusten dizkizunean?",
+                        options: [
+                            { text: "Edukia pasiboki kontsumitzen jarraitzen dut eta azkar pasatzen dut.", value: 1 },
+                            { text: "'Ez zait interesatzen' aukera erabiltzen dut sistema hezten saiatzeko.", value: 3 },
+                            { text: "Plataformaren alborapenei eta haien eragin sozialari buruzko hausnarketa egiten dut.", value: 5 },
+                            { text: "Aplikazioa erabiltzeari uzten diot eta informazio-espazio anitzagoak bilatzen ditut.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "{plataforma} plataforman kontsumitzen duzuna kontrolatzen duzun neurria zein da?",
+                        options: [
+                            { text: "Inondik inora ere ez, plataformak erabakitzen du fluxua eta erosoa zait.", value: 1 },
+                            { text: "Zerbait, nire profila eguneroko elkarrekintzen bidez moldatzen dudalako.", value: 2 },
+                            { text: "Nahiko, bilaketa-helburu argiekin sartzen naizelako.", value: 3 },
+                            { text: "Guztiz, badakit noiz sartu eta haren sistema automatizatua saihesten dut.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Kentu berriak edo joerak ezagutu nahi badituzu {plataforma} plataforman, nola egiten duzu?",
+                        options: [
+                            { text: "Iradokizun edo 'Zuretzat' atalak gidatzen nau.", value: 1 },
+                            { text: "Nire gustuko zerrendak, gomendatutako kanalak edo etiketak aztertzen ditut.", value: 3 },
+                            { text: "Lagunei galdetzen diet edo saretik kanpoko baliabideak kontsultatzen ditut.", value: 4 },
+                            { text: "Modu independentean ikertzen dut, joera nagusietatik kanpo.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Zer iritzi duzu {plataforma} plataformako eduki 'Biralen' edo 'Joeren' inguruan?",
+                        options: [
+                            { text: "Gertatzen denaren berri izateko nire gida nagusia dira.", value: 1 },
+                            { text: "Begiratzen ditut nire ohiko gustuekin kasualitatez bat egiten badute.", value: 2 },
+                            { text: "Hasierako erreferentzia gisa hartzen ditut, baina nire iritzia kanpoan eraikitzen dut.", value: 4 },
+                            { text: "Saihestu egiten ditut, interes sustatzaileen ondorio izan ohi direlako.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Zenbat bider bilatzen duzu nire 'burbuila' edo ohiko lehentasunak hautsi ditzakeen edukia {plataforma} plataforman?",
+                        options: [
+                            { text: "Inoiz ez, plataformak ematen didan etengabeko fluxuari jarraitzen diot.", value: 1 },
+                            { text: "Gutxitan, nire interesen ingurune ezaguna erosoagoa zait.", value: 2 },
+                            { text: "Maiz, bilatzailea erabiliz gai desberdinak aktiboki bilatzen ditudalako.", value: 3 },
+                            { text: "Beti, bilaketa sistematikoak egiten ditut ikuspegi plural bati eusteko.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "{plataforma} plataforman elkarreragitean (gorde, partekatu, iruzkindu), zein da zure motibazio nagusia?",
+                        options: [
+                            { text: "Inertziaz egiten dut, askorik pentsatu gabe.", value: 1 },
+                            { text: "Interfazeak antzeko argitalpenak erakusten jarrai diezadan.", value: 2 },
+                            { text: "Asko ez elkarreragiten saiatzen naiz nire datu pertsonalak babesteko.", value: 5 },
+                            { text: "Edukia sortzen duten pertsonei zintzotasunez babesa emateko, algoritmoari begiratu gabe.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "{plataforma} plataforman scroll infinitua egiten denbora gehiegi pasatzen baduzu, nola erreakzionatzen duzu?",
+                        options: [
+                            { text: "Ikusten jarraitzen dut, autopilotutik ateratzea kostatzen zait.", value: 1 },
+                            { text: "Zentratzen saiatzen naiz eta gai zehatzago eta erabilgarriago bat bilatzen dut.", value: 3 },
+                            { text: "Irten egiten naiz interneten ikusi dudan zerbait interesgarria alderatzeko.", value: 4 },
+                            { text: "Nahi gabe deskonektatzen naiz pantailatik urrun jarduerak egiteko.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Nola deskribatuko zenuke zure harreman ideala {plataforma} plataformarekin?",
+                        options: [
+                            { text: "Nire aldetik ahaleginik eskatu gabe etengabeko entretenimendua eskaintzea.", value: 1 },
+                            { text: "Nire espazioa eguneroko kliken eta 'atsegin duten' bidez moldatzen uztea.", value: 2 },
+                            { text: "Ekimen aktiboa hartzen dudan bilaketa-tresna izatea.", value: 3 },
+                            { text: "Noizbehinkako baliabide bat izatea, nire denboraren kontrol subiranoari eutsiz.", value: 6 }
+                        ]
+                    }
+                ],
+                streamingQuestions: [
+                    {
+                        text: "Aukeratu zer argi izan gabe {plataforma} irekitzean, zer egin ohi duzu?",
+                        options: [
+                            { text: "Gomendatutako lehenengo gauza edo erreproduzitu automatikoa jarri.", value: 1 },
+                            { text: "Navegar por las filas de 'Porque viste...' o categorías similares.", value: 2 },
+                            { text: "Bilatzailea erabili títulu, artista edo gènere zehatz bat bilatzeko.", value: 3 },
+                            { text: "Nire lagunek edo kritikariek aurretik gomendatutako lan bat bilatu.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Nola erabakitzen duzu {plataforma} plataformak iradokitako eduki batek nire denbora merezi duela?",
+                        options: [
+                            { text: "Zuzenean ikusten edo entzuten hasten naiz inolako zalantzarik gabe.", value: 1 },
+                            { text: "Afinitate ehunekoari edo nire historioarekiko antzekotasunari begiratzen diot.", value: 2 },
+                            { text: "Kanpoko webguneetan kritika edo puntuazioak bilatzen ditut (adibidez, IMDB).", value: 4 },
+                            { text: "Aukeratu aurretik plataformaren beraren sustapen bat ote den galdetzen diot nire buruari.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Que fas si {plataforma} t'insisteix amb obres molt comercials o que no encaixen amb tu?",
+                        options: [
+                            { text: "Inertziaz edo erosotasunagatik kontsumitzen amaitzen ditut.", value: 1 },
+                            { text: "Balorazio botoiak erabiltzen ditut edo nire historia garbitzen dut hezten saiatzeko.", value: 3 },
+                            { text: "Katalogoaren kultura-aniztasun ezari buruzko gogoeta kritikoa egiten dut.", value: 5 },
+                            { text: "Aplikazioa itxi eta katalogo alternatibo edo formatu independenteen alde egiten dut.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "To what extent do you feel you control your recommendation catalog on {plataforma}?",
+                        options: [
+                            { text: "Inondik inora ere ez, hasierako orriak aurrean jartzen didanari soilik lotzen natzaio.", value: 1 },
+                            { text: "Zerbait, nire zerrendetara edo gogokoetara lanak gehituz moldatzen dudalako.", value: 2 },
+                            { text: "Nahiko, bilaketa aktiboak egiten ditudalako hasierako orria saihestuz.", value: 3 },
+                            { text: "Guztiz, gomendio automatikoei ez diet jaramonik egiten eta nahi dudanera joaten naiz zuzenean.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Para descobrir joies ocultes o obres menys conegudes a {plataforma}, què fas?",
+                        options: [
+                            { text: "Erreproduzitu automatikoak harritu nazan uzten dut.", value: 1 },
+                            { text: "Interfazean iradokitako subkategoria edo zerrenda tematiko zehatzak esploratzen ditut.", value: 3 },
+                            { text: "Foroak, aldizkariak kontsultatzen ditut edo aplikazioaren ekosistematik kanpoko jendeari galdetzen diot.", value: 4 },
+                            { text: "Datu-base independenteetan ikertzen dut nitxoko edukiak aurkitzeko.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Quina opinió et mereixen les llistes de 'Top 10' o 'Més populars' a {plataforma}?",
+                        options: [
+                            { text: "Gaur zer kontsumitu aukeratzeko aukera seguruena eta azkarrena dira.", value: 1 },
+                            { text: "Revísoas por curiosidad, pero só escollo o que encaixa nos meus gustos.", value: 2 },
+                            { text: "Erreferentzia gisa erabiltzen ditut, pero beti baliozkotzen dut haien kalitatea beste nonbait.", value: 4 },
+                            { text: "Aktiboki saihesten ditut, ekoizpen handiei bakarrik mesede egin ohi dietelako.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Con que frecuencia explores gèneres molt allunyats de les teves preferències habituals a {plataforma}?",
+                        options: [
+                            { text: "Inoiz ez, nahiago dut hasierako orriak eskaintzen didan erosotasun-eremuan konfiantza izan.", value: 1 },
+                            { text: "Gutxitan, sistemak zuzenean gomendatzen badit bakarrik egiten dut.", value: 2 },
+                            { text: "Maiz, bilaketa zehatza erabiliz aniztasuna aurkitzeko.", value: 3 },
+                            { text: "Beti, bilaketa sistematikoa egiten dut eskaintza kultural plural bat eskuratzeko.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Ao engadir contido a 'A miña lista' o dar 'Gústame' en {plataforma}, que buscas principalmente?",
+                        options: [
+                            { text: "Automatikoki egiten dut, eta maiz ez dut inoiz gehiago begiratzen.", value: 1 },
+                            { text: "Algoritmoa fintzeko egiten dut, etorkizunean antzeko gauzak iradoki diezadan.", value: 2 },
+                            { text: "Asko ez egitea saihesten dut, erakusten didaten aniztasuna ez murrizteko.", value: 5 },
+                            { text: "Artea bezala baloratzen ditudan lanen artxibo pertsonal bat mantentzeko.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Si passes massa temps navegant pel menú de {plataforma} sense decidir-te, què fas?",
+                        options: [
+                            { text: "Azalean iradokitako edozein gauza jartzen dut pentsatu beharrik ez izateko.", value: 1 },
+                            { text: "Bilaketa mugatzen dut kategoria, zuzendari edo artista zehatzak erabiliz.", value: 3 },
+                            { text: "Kanpoko kritika-webgune bat kontsultatzen dut nire zalantzak argitzeko eta aukeratzeko.", value: 4 },
+                            { text: "Pantaila itzaltzen dut eta ingurune digitaletik kanpoko beste jarduera bat egitea erabikitzen dut.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "Quina seria la teva experiència ideal a l'utilitzar {plataforma}?",
+                        options: [
+                            { text: "Beti asmatzea eta nabigatu beharrik gabe eduki aproposa ematea.", value: 1 },
+                            { text: "Nire ohituretatik ikastea ingurune guztiz pertsonalizatua sortzeko.", value: 2 },
+                            { text: "Aktiboki bilatzen dudan artxibo neutral hand gisa funtzionatzea.", value: 3 },
+                            { text: "Sarbide-hornitzaile soil bat izatea, nire iritzi libre eta subiranoari eutsiz.", value: 6 }
                         ]
                     }
                 ]
@@ -1333,11 +1577,11 @@
                 
                 platformList.forEach(p => {
                     // Traduïm només "Otra" al diccionari correcte
-                    let pName = p === 'Otra' ? t('ui.unexplored').split(' ')[0] : p; 
+                    let pName = p === 'Otra' ? t('ui.other') : p; 
                     gridHtml += `
-                        <button onclick="selectPlatform('${p}')" class="adventure-btn group">
-                            <div class="transform group-hover:scale-110 transition-transform">${getPlatformLogo(p)}</div>
-                            <span class="mt-3 text-sm font-bold text-slate-700">${pName}</span>
+                        <button onclick="selectPlatform('${p}')" class="adventure-btn group h-full">
+                            <div class="transform group-hover:scale-110 transition-transform flex items-center justify-center">${getPlatformLogo(p)}</div>
+                            <span class="mt-3 text-sm font-bold text-slate-700 text-center leading-tight">${pName}</span>
                         </button>
                     `;
                 });
