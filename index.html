@@ -757,22 +757,40 @@
 
             const exportArea = document.getElementById('compass-export-area');
             const exportFooter = document.getElementById('export-footer');
+            const compassContainer = document.querySelector('.compass-container');
             
             // Mostrem el footer només per la captura
             exportFooter.classList.remove('hidden');
+            
+            // Fixem les dimensions exactes abans de capturar per evitar deformacions a Opera i altres navegadors
+            const originalAreaWidth = exportArea.style.width;
+            exportArea.style.width = exportArea.offsetWidth + 'px';
+            
+            let originalCompassHeight = '';
+            if (compassContainer) {
+                originalCompassHeight = compassContainer.style.height;
+                // Forcem l'alçada a ser igual a l'amplada per assegurar una rodona perfecta (1:1)
+                compassContainer.style.height = compassContainer.offsetWidth + 'px'; 
+            }
             
             // Creem una imatge d'alta qualitat preservant l'estil
             html2canvas(exportArea, {
                 backgroundColor: '#ffffff',
                 scale: 2, 
+                width: exportArea.offsetWidth,
+                windowWidth: window.innerWidth
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'La_Bruixola_Algoritmica.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
-                // Tornem a amagar-lo
+                // Tornem a amagar el footer i restaurem els estils
                 exportFooter.classList.add('hidden');
+                exportArea.style.width = originalAreaWidth;
+                if (compassContainer) {
+                    compassContainer.style.height = originalCompassHeight;
+                }
             });
         }
 
