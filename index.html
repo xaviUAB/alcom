@@ -6,21 +6,41 @@
     <title>La Brúixola Algorítmica | The Algorithmic Compass</title>
     <!-- Carreguem Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Llibreria per generar la imatge descarregable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Analítica anònima -->
+    <script data-goatcounter="https://xaviuab.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <style>
-        /* Estilos personalizados y transiciones */
+        /* Estils personalitzats i transicions */
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        
+        /* Noves animacions de transició per a les preguntes */
+        .slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
 
-        /* * ESTRUCTURA DE CAPAS (Z-INDEX)
-         * 5: Marcas de agua (PASAJERA, NAVEGANTE, SOBERANA)
-         * 10: Centro de la brújula
-         * 15: Nodos negros (Puntos)
-         * 20: Etiquetas blancas (.compass-label)
-         * 30: Aguja (.compass-needle) -> Por encima de las blancas
-         * 40: Tooltips negros académicos (.tooltip) -> Por encima de la aguja
-         * 100: Ventana Modal y Selector de Idiomas
+        /* Feedback visual en seleccionar opció */
+        .option-selected {
+            background-color: #d1fae5 !important; /* emerald-100 */
+            border-color: #10b981 !important; /* emerald-500 */
+            transform: scale(0.98);
+            box-shadow: none !important;
+        }
+
+        /* * ESTRUCTURA DE CAPES (Z-INDEX)
+         * 5: Marques d'aigua (PASAJERA, NAVEGANTE, SOBERANA)
+         * 10: Centre de la brúixola
+         * 15: Nodes negres (Punts)
+         * 20: Etiquetes blanques (.compass-label)
+         * 30: Agulla (.compass-needle) -> Per sobre de les blanques
+         * 40: Tooltips negres acadèmics (.tooltip) -> Per sobre de l'agulla
+         * 100: Finestra Modal i Selector d'Idiomes
          */
 
         .compass-container {
@@ -31,17 +51,6 @@
             margin: 0 auto;
             border-radius: 50%;
             border: 2px solid #cbd5e1;
-            background: 
-                radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.3) 55%, rgba(255,255,255,0) 100%),
-                conic-gradient(
-                    from -30deg,
-                    #fee2e2 0deg 60deg,    
-                    #ffedd5 60deg 120deg,  
-                    #fef9c3 120deg 180deg, 
-                    #ecfccb 180deg 240deg, 
-                    #dcfce7 240deg 300deg, 
-                    #d1fae5 300deg 360deg  
-                );
             box-shadow: inset 0 4px 6px rgba(0,0,0,0.05);
         }
 
@@ -237,12 +246,8 @@
 
     </div>
 
-    <script data-goatcounter="https://xaviuab.goatcounter.com/count"
-            async src="//gc.zgo.at/count.js">
-    </script>
-
     <script>
-        // Llista de plataformes i els seus icones SVG (Apple TV eliminat, restaurat 'Otra')
+        // Llista de plataformes i els seus icones SVG
         const platformList = ['Instagram', 'TikTok', 'YouTube', 'Netflix', 'Prime Video', 'Disney+', 'HBO', 'Spotify', 'Otra'];
 
         function getPlatformLogo(platformName) {
@@ -277,7 +282,7 @@
                     introText: "¡Te damos la bienvenida a esta expedición digital! En un mar de recomendaciones automáticas, cada persona traza su propia ruta. ¿Te dejas llevar por la corriente o tomas el timón de tus decisiones?",
                     startBtn: "Iniciar la aventura",
                     disclaimer1: "Esta aplicación tiene un carácter lúdico y no es una herramienta metodológicamente contrastada. Se ha desarrollado con el único propósito de mejorar la alfabetización algorítmica de las personas usuarias.",
-                    disclaimer2: "Las respuestas facilitadas son totalmente anónimas y ALCOM no almacena ningún dato durante la navegación.",
+                    disclaimer2: "Las respuestas facilitadas son totalmente anónimas y ALCOM no almacena ningún dato durante la navegación. Se utiliza GoatCounter para conocer de manera totalmente anónima el volumen de visitas, el tiempo de permanencia y el uso de las funcionalidades (como la descarga de imágenes). No se utilizan cookies de rastreo. El objetivo es exclusivamente analítico y de mejora del proyecto.",
                     step1: "Paso 1",
                     destTitle: "Elige tu destino de exploración",
                     destSub: "¿En qué territorio digital vamos a adentrarnos hoy?",
@@ -295,11 +300,20 @@
                     endExpedition: "Fin de la expedición",
                     profile: "Perfil:",
                     exploreOther: "Explorar otro territorio",
-                    tipsBtn: "Consejos para mejorar tu agencia",
+                    tipsBtn: "Consejos",
+                    downloadBtn: "Descarga y comparte tu brújula",
                     notebook: "Cuaderno de viaje",
                     understood: "Entendido, ¡a explorar!",
                     footer1: "Un desarrollo de Xavier Ribes para el proyecto ALCOM",
-                    footer2: "Percepción y generación de conocimiento sobre los algoritmos de personalización en las plataformas digitales de comunicación (PID2023-148682OA-I00)"
+                    footer2: "Percepción y generación de conocimiento sobre los algoritmos de personalización en las plataformas digitales de comunicación (PID2023-148682OA-I00)",
+                    breakdownTitle: "Desglose de tu expedición",
+                    breakdownAuto: "Decisiones autónomas (alta agencia):",
+                    breakdownBal: "Decisiones guiadas/mixtas:",
+                    breakdownDeleg: "Decisiones delegadas (baja agencia):",
+                    exportFooter: "Descubre tu perfil algorítmico en https://xaviuab.github.io/alcom/",
+                    strengthTitle: "Puntos fuertes de tu navegación:",
+                    weaknessTitle: "Un espacio para ganar más autonomía:",
+                    topics: ["Gestión del inicio y feed", "Criterio de selección", "Respuesta ante sesgos", "Sensación de control", "Descubrimiento activo", "Consumo de tendencias", "Ruptura de la burbuja de filtros", "Motivación para interactuar", "Desconexión y límites de tiempo", "Expectativas de autonomía"]
                 },
                 results: {
                     profPass: "Persona Pasajera",
@@ -534,11 +548,16 @@
                     endExpedition: "Ende der Expedition",
                     profile: "Profil:",
                     exploreOther: "Ein anderes Gebiet erkunden",
-                    tipsBtn: "Tipps zur Verbesserung deiner Handlungsmacht",
+                    tipsBtn: "Tipps",
+                    downloadBtn: "Karte herunterladen",
                     notebook: "Reisetagebuch",
                     understood: "Verstanden, lass uns erkunden!",
                     footer1: "Eine Entwicklung von Xavier Ribes für das ALCOM-Projekt",
-                    footer2: "Wahrnehmung und Wissensgenerierung über Personalisierungsalgorithmen auf digitalen Kommunikationsplattformen (PID2023-148682OA-I00)"
+                    footer2: "Wahrnehmung und Wissensgenerierung über Personalisierungsalgorithmen auf digitalen Kommunikationsplattformen (PID2023-148682OA-I00)",
+                    breakdownTitle: "Aufschlüsselung deiner Expedition",
+                    breakdownAuto: "Autonome Entscheidungen (hohe Handlungsmacht):",
+                    breakdownBal: "Geleitete/gemischte Entscheidungen:",
+                    breakdownDeleg: "Delegierte Entscheidungen (geringe Handlungsmacht):"
                 },
                 results: {
                     profPass: "Mitreisende Person",
@@ -749,13 +768,261 @@
                     }
                 ]
             },
+            en: {
+                ui: {
+                    title: "The Algorithmic Compass",
+                    introText: "Welcome to this digital expedition! In a sea of automatic recommendations, everyone charts their own course. Do you go with the flow or take the helm of your decisions?",
+                    startBtn: "Start the adventure",
+                    disclaimer1: "This application has a playful nature and is not a methodologically validated tool. It has been developed with the sole purpose of improving the algorithmic literacy of its users.",
+                    disclaimer2: "The answers provided are completely anonymous and ALCOM does not store any data during navigation. GoatCounter is used to know, in a totally anonymous way, the volume of visits, time spent, and the use of features (such as image downloading). Tracking cookies are not used. The objective is exclusively analytical and for the improvement of the project.",
+                    step1: "Step 1",
+                    destTitle: "Choose your exploration destination",
+                    destSub: "Which digital territory are we venturing into today?",
+                    other: "Other territories",
+                    unexplored: "Unexplored territory",
+                    placeName: "Place name",
+                    placePlaceholder: "E.g., Twitch, Filmin...",
+                    ecoType: "Ecosystem type",
+                    ecoSelect: "Select its type...",
+                    ecoSocial: "Social Network (feeds, short videos, creators...)",
+                    ecoStreaming: "Streaming (movies, series, catalogs...)",
+                    confirmRoute: "Confirm route",
+                    alertFill: "Please fill in the name and platform type to continue the journey.",
+                    exploration: "Exploration",
+                    endExpedition: "End of the expedition",
+                    profile: "Profile:",
+                    exploreOther: "Explore another territory",
+                    tipsBtn: "Tips",
+                    downloadBtn: "Download and share your compass",
+                    notebook: "Travel Log",
+                    understood: "Understood, let's explore!",
+                    footer1: "Developed by Xavier Ribes for the ALCOM project",
+                    footer2: "Perception and generation of knowledge about personalization algorithms in digital communication platforms (PID2023-148682OA-I00)",
+                    breakdownTitle: "Breakdown of your expedition",
+                    breakdownAuto: "Autonomous decisions (high agency):",
+                    breakdownBal: "Guided/mixed decisions:",
+                    breakdownDeleg: "Delegated decisions (low agency):",
+                    exportFooter: "Discover your algorithmic profile at https://xaviuab.github.io/alcom/",
+                    strengthTitle: "Strengths of your navigation:",
+                    weaknessTitle: "An area to gain more autonomy:",
+                    topics: ["Feed and startup management", "Selection criteria", "Response to biases", "Sense of control", "Active discovery", "Consumption of trends", "Breaking the filter bubble", "Motivation to interact", "Disconnection and time limits", "Autonomy expectations"]
+                },
+                results: {
+                    profPass: "Passenger Person",
+                    profNav: "Navigator Person",
+                    profSob: "Sovereign<br>Person",
+                    descPass: `On your journey through <strong>{plataforma}</strong> you prefer to book the "all-inclusive" package from the algorithmic travel agency. You fully trust the preset itinerary, letting yourself be carried along the most commercial routes and comfortably visiting the places the platform organizes for you, without leaving the marked path.`,
+                    descNav: `Your time in <strong>{plataforma}</strong> is like joining a "free tour" with a good travel guide in your pocket. You take advantage of the organized circuits the system offers, but sometimes you decide to detour down an alley that catches your eye, ask locals, and keep a balance between the tourist route and your own curiosity.`,
+                    descSob: `Your spirit is completely free and adventure-loving! In <strong>{plataforma}</strong> you flee from mass tourism and move "on your own", charting your own map. You look for hidden gems outside the commercial circuit, always question the tourist brochure they try to sell you, and, if the landscape doesn't convince you, you pack your bags for new horizons.`,
+                    labels: [
+                        { t: "Algorithmic submission", s: '"All-inclusive" trip', th: 'Submission', tt: "Uncritical acceptance of automated recommendations, completely delegating content selection to the system in a state of operational passivity." },
+                        { t: "Selective acceptance", s: 'Agency excursions', th: 'Interaction', tt: "Superficial interaction that accepts system suggestions, applying minimal filters to slightly adapt the algorithmic model to the profile." },
+                        { t: "Guided exploration", s: 'Guided tour', th: 'Resistance', tt: "Instrumental use of native platform tools to actively direct recommendations and negotiate the algorithm's results." },
+                        { t: "External contrast", s: 'Map checking', th: 'Evasion', tt: "Verifying the validity of recommendations by actively consulting information sources and references outside the closed ecosystem." },
+                        { t: "Critical assessment", s: 'Off-route view', th: 'Negotiation', tt: "Analytical reflection on the commercial, ideological, or design biases of recommendation systems, critically evaluating the environment." },
+                        { t: "Autonomous choice", s: 'Independent adventure', th: 'Conscious choice', tt: "Full exercise of agency, characterized by evasion of automated curation and the independent search for cultural content." }
+                    ],
+                    tips: [
+                        { t: "Next destination: Customized excursions", p1: "You've enjoyed the all-inclusive trip, but it's time to start choosing your own routes.", p2: "<strong>💡 Expedition tip:</strong> Actively use the 'Like' or 'Not interested' buttons. Force the algorithmic travel agency to listen to your preferences instead of passively accepting their daily menu." },
+                        { t: "Next destination: Taking the helm", p1: "You already filter what you don't like, that's a big step! Now it's your turn to take the initiative.", p2: "<strong>💡 Expedition tip:</strong> Instead of waiting for the screen to offer you content, use the search bar. Actively look for creators, genres, or specific topics. Become the person guiding the expedition." },
+                        { t: "Next destination: Cross-checking maps", p1: "You know how to navigate the platform and guide your route, but sometimes official maps hide information.", p2: "<strong>💡 Expedition tip:</strong> When the platform strongly recommends something, exit the app and look for opinions on external websites, forums, or communities. Don't rely solely on the agency's official version." },
+                        { t: "Next destination: Questioning the agency", p1: "You already contrast information outside, now it's time to sharpen your critical gaze towards whoever organizes the trip.", p2: "<strong>💡 Expedition tip:</strong> Always ask yourself <strong>why</strong> they recommend something to you. Is it a paid campaign? Is it content designed to keep you on the screen for hours? Recognizing the commercial interests behind the recommendation will make you unstoppable." },
+                        { t: "Next destination: Total adventure", p1: "You have great critical capacity. The last step is total independence.", p2: "<strong>💡 Expedition tip:</strong> Spend time discovering culture and information completely outside of large commercial platforms. Support independent spaces, fanzines, blogs, or alternative catalogs. Create your own unexplored routes!" },
+                        { t: "You are pure sovereignty!", p1: "You have reached the maximum level of agency in this expedition.", p2: "<strong>💡 Expedition tip:</strong> Keep maintaining this great autonomy and share your discoveries (your 'secret maps') with your community. Help other people step out of their own commercial routes and teach them to explore freely." }
+                    ]
+                },
+                socialQuestions: [
+                    {
+                        text: "When opening {plataforma} without a clear goal, what do you usually do?",
+                        options: [
+                            { text: "Watch the first thing that appears on my main screen or feed.", value: 1 },
+                            { text: "Scroll and 'like' what appeals to me so the algorithm learns.", value: 2 },
+                            { text: "Use the search bar or tags (hashtags) to find something specific.", value: 3 },
+                            { text: "Go straight to profiles or channels my community has recommended.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "How do you decide if a post or video on {plataforma} is worth it?",
+                        options: [
+                            { text: "I just let it play; I blindly trust the algorithm.", value: 1 },
+                            { text: "I consider if it's similar to other things I've already consumed here.", value: 2 },
+                            { text: "I leave the app to look for more information from other sources.", value: 4 },
+                            { text: "I analyze why it's being recommended to me and if there are commercial or viral biases.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "What do you do when {plataforma}'s system shows biased content or things you don't like?",
+                        options: [
+                            { text: "I keep consuming the content passively and scroll quickly.", value: 1 },
+                            { text: "I use the 'not interested' option to try and educate the system.", value: 3 },
+                            { text: "I reflect on the platform's biases and their social impact.", value: 5 },
+                            { text: "I stop using the app and look for more diverse informational spaces.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "To what extent do you feel you control what you consume on {plataforma}?",
+                        options: [
+                            { text: "Not at all, the platform decides the flow and I find it comfortable.", value: 1 },
+                            { text: "Somewhat, because I shape my profile through daily interactions.", value: 2 },
+                            { text: "Quite a lot, because I log in with clear search purposes.", value: 3 },
+                            { text: "Totally, I'm aware of when to log in and I avoid its automated system.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "If you want to discover new accounts or trends on {plataforma}, how do you do it?",
+                        options: [
+                            { text: "I let the suggestions or 'For You' section guide me.", value: 1 },
+                            { text: "I check lists, recommended channels, or tags of my interests.", value: 3 },
+                            { text: "I ask friends or consult media outside the network.", value: 4 },
+                            { text: "I research independently, outside the dominant trends.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "What is your opinion on 'Viral' or 'Trending' content on {plataforma}?",
+                        options: [
+                            { text: "They are my main guide to stay up to date with what's happening.", value: 1 },
+                            { text: "I look at them if they happen to fit what I usually watch.", value: 2 },
+                            { text: "I take them as an initial reference, but form my own opinion outside.", value: 4 },
+                            { text: "I avoid them because they are usually the result of promotional interests.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "How often do you search for content that breaks your 'bubble' or usual preferences on {plataforma}?",
+                        options: [
+                            { text: "Never, I follow the constant flow the platform gives me.", value: 1 },
+                            { text: "Rarely, I find my familiar environment of interests more comfortable.", value: 2 },
+                            { text: "Frequently, I actively search for different topics using the search bar.", value: 3 },
+                            { text: "Always, I conduct systematic searches to maintain a pluralistic view.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "When interacting (saving, sharing, commenting) on {plataforma}, what is your main motivation?",
+                        options: [
+                            { text: "I do it out of habit, without thinking much about it.", value: 1 },
+                            { text: "So that the interface keeps showing me similar posts.", value: 2 },
+                            { text: "I try not to interact too much to protect my personal data.", value: 5 },
+                            { text: "To genuinely support content creators, regardless of the algorithm.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "If you spend too much time 'doomscrolling' on {plataforma}, how do you react?",
+                        options: [
+                            { text: "I keep watching, I find it hard to get out of autopilot.", value: 1 },
+                            { text: "I try to focus and find a more specific and useful topic.", value: 3 },
+                            { text: "I exit to cross-check something interesting I saw on the internet.", value: 4 },
+                            { text: "I intentionally disconnect to do activities away from screens.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "How would you describe your ideal relationship with {plataforma}?",
+                        options: [
+                            { text: "That it offers constant entertainment without requiring effort from me.", value: 1 },
+                            { text: "That it lets me adapt my space through my daily clicks and 'likes'.", value: 2 },
+                            { text: "That it acts as a search tool where I take the initiative.", value: 3 },
+                            { text: "That it's just an occasional resource, keeping sovereign control of my time.", value: 6 }
+                        ]
+                    }
+                ],
+                streamingQuestions: [
+                    {
+                        text: "When opening {plataforma} without knowing what to pick, what do you usually do?",
+                        options: [
+                            { text: "Play the first featured recommendation or autoplay.", value: 1 },
+                            { text: "Browse through the 'Because you watched...' rows or similar categories.", value: 2 },
+                            { text: "Use the search bar to find a specific title, artist, or genre.", value: 3 },
+                            { text: "Look for a work that my friends or critics have previously recommended to me.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "How do you decide if a piece of content suggested by {plataforma} is worth your time?",
+                        options: [
+                            { text: "I just start watching or listening to it directly without hesitation.", value: 1 },
+                            { text: "I look at the affinity percentage or if it's similar to my history.", value: 2 },
+                            { text: "I look for reviews or scores on external websites (e.g., IMDB).", value: 4 },
+                            { text: "I wonder if it's a promotion from the platform itself before choosing.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "What do you do if {plataforma} insists on highly commercial works or things that don't fit you?",
+                        options: [
+                            { text: "I end up consuming them out of habit or convenience.", value: 1 },
+                            { text: "I use the rating buttons or clear my history to try and educate it.", value: 3 },
+                            { text: "I critically reflect on the catalog's lack of cultural diversity.", value: 5 },
+                            { text: "I close the application and opt for alternative catalogs or independent formats.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "To what extent do you feel you control your recommendation catalog on {plataforma}?",
+                        options: [
+                            { text: "Not at all, I just stick to what the homepage puts in front of me.", value: 1 },
+                            { text: "Somewhat, because I shape it by adding works to my lists or favorites.", value: 2 },
+                            { text: "Quite a lot, because I actively search, skipping the main page.", value: 3 },
+                            { text: "Totally, I ignore automatic suggestions and go straight to what I want.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "To discover hidden gems or lesser-known works on {plataforma}, what do you do?",
+                        options: [
+                            { text: "I let autoplay surprise me.", value: 1 },
+                            { text: "I explore specific subcategories or thematic lists suggested in the UI.", value: 3 },
+                            { text: "I consult forums, magazines, or ask people outside the app's ecosystem.", value: 4 },
+                            { text: "I research in independent databases to find niche content.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "What is your opinion of the 'Top 10' or 'Most popular' lists on {plataforma}?",
+                        options: [
+                            { text: "They are the safest and fastest option to choose what to consume today.", value: 1 },
+                            { text: "I check them out of curiosity, but only pick what fits my tastes.", value: 2 },
+                            { text: "I use them as a reference, but always validate their quality elsewhere.", value: 4 },
+                            { text: "I actively avoid them because they usually benefit large productions.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "How often do you explore genres very far from your usual preferences on {plataforma}?",
+                        options: [
+                            { text: "Never, I prefer to trust the comfort zone offered by the homepage.", value: 1 },
+                            { text: "Rarely, I only do it if the system recommends it directly to me.", value: 2 },
+                            { text: "Frequently, using the manual search to find variety.", value: 3 },
+                            { text: "Always, I conduct a systematic search to access a plural cultural offering.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "When adding content to 'My list' or 'Liking' it on {plataforma}, what is your main goal?",
+                        options: [
+                            { text: "I do it automatically, and often I never look at it again.", value: 1 },
+                            { text: "I do it to refine the algorithm so it suggests similar things in the future.", value: 2 },
+                            { text: "I avoid doing it much so as not to reduce the diversity of what they show me.", value: 5 },
+                            { text: "To keep a personal archive of works that I truly value as art.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "If you spend too much time browsing the {plataforma} menu without deciding, what do you do?",
+                        options: [
+                            { text: "I end up putting on whatever is suggested on the cover so I don't have to think.", value: 1 },
+                            { text: "I narrow the search using specific categories, directors, or artists.", value: 3 },
+                            { text: "I consult an external review website to clear my doubts and choose.", value: 4 },
+                            { text: "I turn off the screen and decide to do another activity away from digital tech.", value: 6 }
+                        ]
+                    },
+                    {
+                        text: "What would be your ideal experience when using {plataforma}?",
+                        options: [
+                            { text: "That it always gets it right and gives me ideal content without having to browse.", value: 1 },
+                            { text: "That it learns from my habits to create a perfectly personalized environment.", value: 2 },
+                            { text: "That it functions as a large neutral archive where I actively search.", value: 3 },
+                            { text: "That it is just an access provider, maintaining my free and sovereign judgment.", value: 6 }
+                        ]
+                    }
+                ]
+            },
             ca: {
                 ui: {
                     title: "La Brúixola Algorítmica",
                     introText: "Et donem la benvinguda a aquesta expedició digital! En un mar de recomanacions automàtiques, cada persona traça la seva pròpia ruta. Et deixes portar per la corrent o agafes el timó de les teves decisions?",
                     startBtn: "Iniciar l'aventura",
                     disclaimer1: "Aquesta aplicació té un caràcter lúdic i no és una eina metodològicament contrastada. S'ha desenvolupat amb l'únic propòsit de millorar l'alfabetització algorítmica de les persones usuàries.",
-                    disclaimer2: "Les respostes facilitades són totalment anònimes i ALCOM no emmagatzema cap dada durant la navegació.",
+                    disclaimer2: "Les respostes facilitades són totalment anònimes i ALCOM no emmagatzema cap dada durant la navegació. S'utilitza GoatCounter per conèixer de manera totalment anònima el volum de visites, el temps de permanència i l'ús de les funcionalitats (com la descàrrega d'imatges). No s'utilitzen cookies de rastreig. L'objectiu és exclusivament analític i de millora del projecte.",
                     step1: "Pas 1",
                     destTitle: "Tria el teu destí d'exploració",
                     destSub: "En quin territori digital ens endinsarem avui?",
@@ -773,11 +1040,20 @@
                     endExpedition: "Fi de l'expedició",
                     profile: "Perfil:",
                     exploreOther: "Explorar un altre territori",
-                    tipsBtn: "Consells per millorar la teva agència",
+                    tipsBtn: "Consells",
+                    downloadBtn: "Descarrega i comparteix la teva brúixola",
                     notebook: "Quadern de viatge",
                     understood: "Entès, a explorar!",
                     footer1: "Un desenvolupament de Xavier Ribes per al projecte ALCOM",
-                    footer2: "Percepció i generació de coneixement sobre els algorismes de personalització en les plataformes digitals de comunicació (PID2023-148682OA-I00)"
+                    footer2: "Percepció i generació de coneixement sobre els algorismes de personalització en les plataformes digitals de comunicació (PID2023-148682OA-I00)",
+                    breakdownTitle: "Desglossament de la teva expedició",
+                    breakdownAuto: "Decisions autònomes (alta agència):",
+                    breakdownBal: "Decisions guiades/mixtes:",
+                    breakdownDeleg: "Decisions delegadas (baixa agència):",
+                    exportFooter: "Descobreix el teu perfil algorítmic a https://xaviuab.github.io/alcom/",
+                    strengthTitle: "Punts forts de la teva navegació:",
+                    weaknessTitle: "Un espai per guanyar més autonomia:",
+                    topics: ["Gestió de l'inici i feed", "Criteri de selecció", "Resposta davant dels biaixos", "Sensació de control", "Descobriment actiu", "Consum de tendències", "Ruptura de la bombolla de filtres", "Motivació per interactuar", "Desconnexió i límits de temps", "Expectatives d'autonomia"]
                 },
                 results: {
                     profPass: "Persona Passatgera",
@@ -796,7 +1072,7 @@
                     ],
                     tips: [
                         { t: "Següent destí: Excursions personalitzades", p1: "Has gaudit del viatge amb tot inclòs, però és hora de començar a triar les teves pròpies rutes.", p2: "<strong>💡 El consell de l'expedició:</strong> Utilitza els botons de 'M'agrada' o 'No m'interessa' activament. Obliga a l'agència turística algorítmica a escoltar les teves preferències en lloc d'acceptar passivament el seu menú del dia." },
-                        { t: "Següent destí: Agafar el timó", p1: "Ja filtres el que no t'agrada, és un gran pas! Ara et toca prendre la iniciativa.", p2: "<strong>💡 El consell de l'expedició:</strong> En lloc d'esperar que la pantalla t'ofereixi contingut, utilitza el cercador. Busca activament creadors, gèneres o temàtiques concretes. Converteix-te en la persona que guia l'expedició." },
+                        { t: "Següent destí: Agafar el timó", p1: "Ja filtres el que no t'agrada, és un gran pas! Ara et toca prendre la iniciativa.", p2: "<strong>💡 El consell de l'expedició:</strong> En lloc d'esperar que la pantalla t'ofereixi contingut, utilitza el cercador. Busca activament creadores, gèneres o temàtiques concretes. Converteix-te en la persona que guia l'expedició." },
                         { t: "Següent destí: Contrastar els mapes", p1: "Saps moure't per la plataforma i guiar la teva ruta, però a vegades els mapes oficials oculten informació.", p2: "<strong>💡 El consell de l'expedició:</strong> Quan la plataforma et recomani una cosa amb molta insistència, surt de l'aplicació i busca opinions a webs externes, fòrums o comunitats. No et quedis només amb la versió oficial de l'agència." },
                         { t: "Següent destí: Qüestionar l'agència", p1: "Ja contrastes la informació fora, ara toca afilar la teva mirada crítica cap a qui organitza el viatge.", p2: "<strong>💡 El consell de l'expedició:</strong> Pregunta't sempre <strong>per què</strong> et recomanen una cosa. És una campanya pagada? És contingut dissenyat per retenir-te hores a la pantalla? Reconèixer els interessos comercials darrere de la recomanació et farà imparable." },
                         { t: "Següent destí: L'aventura total", p1: "Tens una gran capacitat crítica. L'últim pas és la independència total.", p2: "<strong>💡 El consell de l'expedició:</strong> Dedica temps a descobrir cultura i informació completament fora de les grans plataformes comercials. Dona suport a espais independents, fanzins, blocs o catàlegs alternatius. Crea les teves pròpies rutes inexplorades!" },
@@ -994,7 +1270,7 @@
                     introText: "Dámosche a benvida a esta expedición dixital! Nun mar de recomendacións automáticas, cada persoa traza a súa propia ruta. Déixaste levar pola corrente ou tomas o temón das túas decisións?",
                     startBtn: "Iniciar a aventura",
                     disclaimer1: "Esta aplicación ten un carácter lúdico e non é unha ferramenta metodoloxicamente contrastada. Desenvolveuse co único propósito de mellorar a alfabetización algorítmica das persoas usuarias.",
-                    disclaimer2: "As respostas facilitadas son totalmente anónimas e ALCOM non almacena ningún dato durante a navegación.",
+                    disclaimer2: "As respostas facilitadas son totalmente anónimas e ALCOM non almacena ningún dato durante a navegación. Utilízase GoatCounter para coñecer de xeito totalmente anónimo o volume de visitas, o tempo de permanencia e o uso das funcionalidades (como a descarga de imaxes). Non se utilizan cookies de rastrexo. O obxectivo é exclusivamente analítico e de mellora do proxecto.",
                     step1: "Paso 1",
                     destTitle: "Elixe o teu destino de exploración",
                     destSub: "En que territorio dixital imos penetrar hoxe?",
@@ -1012,11 +1288,20 @@
                     endExpedition: "Fin da expedición",
                     profile: "Perfil:",
                     exploreOther: "Explorar outro territorio",
-                    tipsBtn: "Consellos para mellorar a túa axencia",
+                    tipsBtn: "Consellos",
+                    downloadBtn: "Descarga e comparte o teu compás",
                     notebook: "Caderno de viaxe",
                     understood: "Entendido, a explorar!",
                     footer1: "Un desenvolvemento de Xavier Ribes para o proxecto ALCOM",
-                    footer2: "Percepción e xeración de coñecemento sobre os algoritmos de personalización nas plataformas dixitais de comunicación (PID2023-148682OA-I00)"
+                    footer2: "Percepción e xeración de coñecemento sobre os algoritmos de personalización nas plataformas dixitais de comunicación (PID2023-148682OA-I00)",
+                    breakdownTitle: "Desglose da túa expedición",
+                    breakdownAuto: "Decisións autónomas (alta axencia):",
+                    breakdownBal: "Decisións guiadas/mixtas:",
+                    breakdownDeleg: "Decisións delegadas (baixa axencia):",
+                    exportFooter: "Descobre o teu perfil algorítmico en https://xaviuab.github.io/alcom/",
+                    strengthTitle: "Puntos fortes da túa navegación:",
+                    weaknessTitle: "Un espazo para gañar máis autonomía:",
+                    topics: ["Xestión do inicio e feed", "Criterio de selección", "Resposta ante os rumbos", "Sensación de control", "Descubrimento activo", "Consumo de tendencias", "Ruptura da burbulla de filtros", "Motivación para interactuar", "Desconexión e límites de tempo", "Expectativas de autonomía"]
                 },
                 results: {
                     profPass: "Persoa Pasaxeira",
@@ -1154,7 +1439,7 @@
                         ]
                     },
                     {
-                        text: "Que fas se {plataforma} insísteche con obras moi comerciais ou que non encaixan contigo?",
+                        text: "Que fas se {plataforma} insísteche con obras moi comerciais ou que non encaixen contigo?",
                         options: [
                             { text: "Acáboas consumindo por inercia ou comodidade.", value: 1 },
                             { text: "Uso os botóns de valoración ou borro o historial para tentar educala.", value: 3 },
@@ -1233,7 +1518,7 @@
                     introText: "Ongi etorri espedizio digital honetara! Gomendio automatikoen itsasoan, norberak bere bidea zehazten du. Korronteak eramaten uzten zara ala erabakien gidaritza hartzen duzu?",
                     startBtn: "Hasi abentura",
                     disclaimer1: "Aplikazio honek jolas-izaera du eta ez da metodologikoki kontrastatutako tresna bat. Erabiltzaileen alfabetatze algoritmikoa hobetzeko helburu bakarrarekin garatu da.",
-                    disclaimer2: "Emandako erantzunak guztiz anonimoak dira eta ALCOMek ez du inolako daturik gordetzen nabigazioan zehar.",
+                    disclaimer2: "Emandako erantzunak guztiz anonimoak dira eta ALCOMek ez du inolako daturik gordetzen nabigazioan zehar. GoatCounter erabiltzen da bisiten bolumena, emandako denbora eta funtzionalitateen erabilera (irudien deskarga, adibidez) modu erabat anonimoan ezagutzeko. Ez da jarraipen-cookierik erabiltzen. Helburua esklusiboki analitikoa eta proiektua hobetzekoa da.",
                     step1: "1. urratsa",
                     destTitle: "Aukeratu zure esplorazio-helburua",
                     destSub: "Zer lurralde digitaletan sartuko gara gaur?",
@@ -1251,11 +1536,20 @@
                     endExpedition: "Espedizioaren amaiera",
                     profile: "Profila:",
                     exploreOther: "Esploratu beste lurralde bat",
-                    tipsBtn: "Zure agentzia hobetzeko aholkuak",
+                    tipsBtn: "Aholkuak",
+                    downloadBtn: "Deskargatu eta partekatu zure orratza",
                     notebook: "Bidaia-koadernoa",
                     understood: "Ados, esploratzera!",
                     footer1: "Xavier Ribesek ALCOM proiekturako egindako garapena",
-                    footer2: "Komunikazio-plataforma digitaletako pertsonalizazio-algoritmoei buruzko ezagutzaren hautematea eta sorrera (PID2023-148682OA-I00)"
+                    footer2: "Komunikazio-plataforma digitaletako pertsonalizazio-algoritmoei buruzko ezagutzaren hautematea eta sorrera (PID2023-148682OA-I00)",
+                    breakdownTitle: "Zure espedizioaren banaketa",
+                    breakdownAuto: "Erabaki autonomoak (agentzia handia):",
+                    breakdownBal: "Gidatutako/mistoak diren erabakiak:",
+                    breakdownDeleg: "Eskuordetutako erabakiak (agentzia txikia):",
+                    exportFooter: "Ezagutu zure profil algoritmikoa hemen: https://xaviuab.github.io/alcom/",
+                    strengthTitle: "Zure nabigazioaren gune indartsuak:",
+                    weaknessTitle: "Autonomia handiagoa lortzeko espazioa:",
+                    topics: ["Hasierako orriaren eta feed-aren kudeaketa", "Hautaketa-irizpidea", "Alborapenei emandako erantzuna", "Kontrol-sentsazioa", "Aurkikuntza aktiboa", "Joeren kontsumoa", "Iragazki-burbuila apurtzea", "Elkarreragiteko motibazioa", "Deskonektatzea eta denbora-mugak", "Autonomia-itxaropenak"]
                 },
                 results: {
                     profPass: "Pertsona Bidaiaria",
@@ -1549,6 +1843,38 @@
             renderOnboardingStep(1);
         }
 
+        // Funció per descarregar el mapa en imatge
+        function downloadMap() {
+            // Registre d'esdeveniment a GoatCounter
+            if (window.goatcounter && window.goatcounter.count) {
+                window.goatcounter.count({
+                    path:  'click-descarrega-imatge',
+                    title: "Descàrrega d'Imatge de l'App",
+                    event: true // Això indica a GoatCounter que és un esdeveniment i no una visita a una pàgina nova
+                });
+            }
+
+            const exportArea = document.getElementById('compass-export-area');
+            const exportFooter = document.getElementById('export-footer');
+            
+            // Mostrem el footer només per la captura
+            exportFooter.classList.remove('hidden');
+            
+            // Creem una imatge d'alta qualitat preservant l'estil
+            html2canvas(exportArea, {
+                backgroundColor: '#ffffff',
+                scale: 2, 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'La_Bruixola_Algoritmica.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Tornem a amagar-lo
+                exportFooter.classList.add('hidden');
+            });
+        }
+
         function renderOnboardingStep(step) {
             currentView = 'onboarding';
             currentOnboardingStep = step;
@@ -1683,19 +2009,20 @@
 
             shuffledOptions.forEach((option) => {
                 optionsHtml += `
-                    <button onclick="handleAnswer(${option.value})" class="w-full text-left p-4 mb-3 rounded-xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-slate-700 font-medium text-lg shadow-sm">
+                    <button onclick="handleAnswer(${option.value}, this)" class="w-full text-left p-4 mb-3 rounded-xl border-2 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-slate-700 font-medium text-lg shadow-sm focus:outline-none">
                         ${formatText(option.text)}
                     </button>
                 `;
             });
 
+            // Afegim la classe d'animació slide-in-right exclusivament al contenidor de la pregunta
             appContainer.innerHTML = `
-                <div class="fade-in flex flex-col h-full min-h-[400px]">
+                <div class="flex flex-col h-full min-h-[400px]">
                     <div class="h-2 w-full bg-slate-100 flex-shrink-0">
                         <div class="h-2 bg-emerald-500 transition-all duration-500" style="width: ${progress}%"></div>
                     </div>
                     
-                    <div class="p-8 flex-grow">
+                    <div class="p-8 flex-grow slide-in-right" id="questionContainer">
                         <div class="flex items-center justify-between mb-6">
                             <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase">${t('ui.exploration')} ${currentQuestionIndex + 1}/${activeQuestions.length}</span>
                             ${logo}
@@ -1713,8 +2040,16 @@
             `;
         }
 
-        function handleAnswer(value) {
+        function handleAnswer(value, btnElement) {
+            // Desactiva tots els botons per evitar clics dobles ràpids
+            const buttons = document.querySelectorAll('#questionContainer button');
+            buttons.forEach(b => b.disabled = true);
+            
+            // Afegeix el feedback visual d'opció escollida
+            btnElement.classList.add('option-selected');
+
             userScores.push(value);
+            
             if (currentQuestionIndex < activeQuestions.length - 1) {
                 currentQuestionIndex++;
                 renderQuestion();
@@ -1747,11 +2082,41 @@
                 profileDescription = t('results.descSob');
             }
 
+            // Càlcul pel Desglossament Detallat de Resultats
+            let autoCount = 0;
+            let delegCount = 0;
+            let balCount = 0;
+            userScores.forEach(score => {
+                if(score >= 5) autoCount++;
+                else if(score <= 2) delegCount++;
+                else balCount++;
+            });
+            
+            // Determinem Punts Forts i Febles
+            const maxScore = Math.max(...userScores);
+            const minScore = Math.min(...userScores);
+            const bestIndex = userScores.indexOf(maxScore);
+            const worstIndex = userScores.indexOf(minScore);
+            const topicsList = i18n[currentLang].ui.topics;
+            
+            let breakdownHtml = `
+                <div data-html2canvas-ignore="true" class="mt-8 p-5 bg-slate-50 rounded-xl border border-slate-200 text-left shadow-sm max-w-sm mx-auto">
+                    <h4 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                        ${t('ui.breakdownTitle')}
+                    </h4>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li class="flex justify-between items-center"><span>${t('ui.breakdownAuto')}</span> <span class="font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-md">${autoCount}/10</span></li>
+                        <li class="flex justify-between items-center"><span>${t('ui.breakdownBal')}</span> <span class="font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md">${balCount}/10</span></li>
+                        <li class="flex justify-between items-center"><span>${t('ui.breakdownDeleg')}</span> <span class="font-bold text-pink-600 bg-pink-100 px-2 py-0.5 rounded-md">${delegCount}/10</span></li>
+                    </ul>
+                </div>
+            `;
+
             // Recuperar textos de les Fases/Labels i Tips
             const labelsData = i18n[currentLang].results.labels;
             const tipsData = i18n[currentLang].results.tips;
             
-            // L'índex per al Tip correspon a roundedAverage - 1 (de 1 a 6 => índex 0 a 5)
             const tipIndex = Math.max(0, Math.min(roundedAverage - 1, 5));
             const activeTip = tipsData[tipIndex];
             
@@ -1759,103 +2124,126 @@
                 <h4 class="text-lg font-bold text-emerald-700 mb-2">${activeTip.t}</h4>
                 <p class="mb-4">${activeTip.p1}</p>
                 <p>${activeTip.p2}</p>
+                <div class="mt-6 pt-5 border-t border-slate-200">
+                    <h5 class="text-sm font-bold text-emerald-600 mb-1">${t('ui.strengthTitle')}</h5>
+                    <p class="text-slate-700 text-sm mb-4">✨ ${topicsList[bestIndex]}</p>
+                    
+                    <h5 class="text-sm font-bold text-amber-600 mb-1">${t('ui.weaknessTitle')}</h5>
+                    <p class="text-slate-700 text-sm">🌱 ${topicsList[worstIndex]}</p>
+                </div>
             `;
 
             const needleAngle = ((average - 1) * 60);
             const logo = getPlatformLogo(participantData.platformNameRaw);
-            
-            // Suprimim el salt de línia al títol principal
             const safeProfileName = profileName.replace('<br>', ' ');
 
             appContainer.innerHTML = `
-                <div class="p-8 fade-in text-center flex flex-col h-full">
-                    <div class="mb-4 flex justify-center">${logo}</div>
-                    <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase block mb-1">${t('ui.endExpedition')}</span>
-                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">${t('ui.profile')} <span class="${profileColor}">${safeProfileName}</span></h2>
+                <div class="fade-in text-center flex flex-col h-full overflow-x-hidden">
                     
-                    <div class="max-w-md mx-auto p-4 bg-slate-50 rounded-xl mb-4">
-                        <p class="text-slate-600">${formatText(profileDescription)}</p>
-                    </div>
+                    <!-- Àrea d'exportació de la imatge per descarregar -->
+                    <div id="compass-export-area" class="p-8 pb-4 bg-white relative z-10">
+                        <div class="mb-4 flex justify-center">${logo}</div>
+                        <span class="text-sm font-bold tracking-widest text-emerald-600 uppercase block mb-1">${t('ui.endExpedition')}</span>
+                        <h2 class="text-4xl font-extrabold text-slate-800 mb-4">${t('ui.profile')} <br> <span class="${profileColor}">${safeProfileName}</span></h2>
+                        
+                        <div class="max-w-md mx-auto p-4 bg-slate-50 rounded-xl mb-4">
+                            <p class="text-slate-600">${formatText(profileDescription)}</p>
+                        </div>
 
-                    <button onclick="openTipsModal()" class="mb-10 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-2.5 px-6 rounded-full border border-amber-300 transition-colors shadow-sm flex items-center justify-center gap-2 mx-auto">
-                        <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                        ${t('ui.tipsBtn')}
-                    </button>
+                        <div class="relative w-full flex justify-center py-10 mb-2 scale-95 sm:scale-100">
+                            <div class="compass-container">
+                                <canvas id="compassBg" width="400" height="400" class="absolute inset-0 z-0 rounded-full" style="width: 100%; height: 100%;"></canvas>
+                                
+                                <div class="profile-label profile-pasajera">${t('results.profPass')}</div>
+                                <div class="profile-label profile-navegante">${t('results.profNav')}</div>
+                                <div class="profile-label profile-soberana">${t('results.profSob')}</div>
 
-                    <div class="relative w-full flex justify-center py-12 mb-6">
-                        <div class="compass-container">
-                            
-                            <div class="profile-label profile-pasajera">${t('results.profPass')}</div>
-                            <div class="profile-label profile-navegante">${t('results.profNav')}</div>
-                            <div class="profile-label profile-soberana">${t('results.profSob')}</div>
+                                <div class="compass-node node-1"></div>
+                                <div class="compass-node node-2"></div>
+                                <div class="compass-node node-3"></div>
+                                <div class="compass-node node-4"></div>
+                                <div class="compass-node node-5"></div>
+                                <div class="compass-node node-6"></div>
 
-                            <div class="compass-node node-1"></div>
-                            <div class="compass-node node-2"></div>
-                            <div class="compass-node node-3"></div>
-                            <div class="compass-node node-4"></div>
-                            <div class="compass-node node-5"></div>
-                            <div class="compass-node node-6"></div>
+                                <div class="compass-label label-1">
+                                    <span class="block font-bold">${labelsData[0].t}</span>
+                                    <span class="font-normal text-xs text-slate-500">${labelsData[0].s}</span>
+                                </div>
+                                <div class="tooltip tooltip-1 tooltip-down">
+                                    <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[0].th}</span>
+                                    ${labelsData[0].tt}
+                                </div>
+                                
+                                <div class="compass-label label-2">
+                                    <span class="block font-bold">${labelsData[1].t}</span>
+                                    <span class="font-normal text-xs text-slate-500">${labelsData[1].s}</span>
+                                </div>
+                                <div class="tooltip tooltip-2">
+                                    <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[1].th}</span>
+                                    ${labelsData[1].tt}
+                                </div>
+                                
+                                <div class="compass-label label-3">
+                                    <span class="block font-bold">${labelsData[2].t}</span>
+                                    <span class="font-normal text-xs text-slate-500">${labelsData[2].s}</span>
+                                </div>
+                                <div class="tooltip tooltip-3">
+                                    <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[2].th}</span>
+                                    ${labelsData[2].tt}
+                                </div>
+                                
+                                <div class="compass-label label-4">
+                                    <span class="block font-bold">${labelsData[3].t}</span>
+                                    <span class="font-normal text-xs text-slate-500">${labelsData[3].s}</span>
+                                </div>
+                                <div class="tooltip tooltip-4 tooltip-up">
+                                    <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[3].th}</span>
+                                    ${labelsData[3].tt}
+                                </div>
+                                
+                                <div class="compass-label label-5">
+                                    <span class="block font-bold">${labelsData[4].t}</span>
+                                    <span class="font-normal text-xs text-slate-500">${labelsData[4].s}</span>
+                                </div>
+                                <div class="tooltip tooltip-5">
+                                    <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[4].th}</span>
+                                    ${labelsData[4].tt}
+                                </div>
+                                
+                                <div class="compass-label label-6">
+                                    <span class="block font-bold">${labelsData[5].t}</span>
+                                    <span class="font-normal text-xs text-slate-500">${labelsData[5].s}</span>
+                                </div>
+                                <div class="tooltip tooltip-6">
+                                    <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[5].th}</span>
+                                    ${labelsData[5].tt}
+                                </div>
 
-                            <div class="compass-label label-1">
-                                <span class="block font-bold">${labelsData[0].t}</span>
-                                <span class="font-normal text-xs text-slate-500">${labelsData[0].s}</span>
-                            </div>
-                            <div class="tooltip tooltip-1 tooltip-down">
-                                <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[0].th}</span>
-                                ${labelsData[0].tt}
-                            </div>
-                            
-                            <div class="compass-label label-2">
-                                <span class="block font-bold">${labelsData[1].t}</span>
-                                <span class="font-normal text-xs text-slate-500">${labelsData[1].s}</span>
-                            </div>
-                            <div class="tooltip tooltip-2">
-                                <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[1].th}</span>
-                                ${labelsData[1].tt}
-                            </div>
-                            
-                            <div class="compass-label label-3">
-                                <span class="block font-bold">${labelsData[2].t}</span>
-                                <span class="font-normal text-xs text-slate-500">${labelsData[2].s}</span>
-                            </div>
-                            <div class="tooltip tooltip-3">
-                                <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[2].th}</span>
-                                ${labelsData[2].tt}
-                            </div>
-                            
-                            <div class="compass-label label-4">
-                                <span class="block font-bold">${labelsData[3].t}</span>
-                                <span class="font-normal text-xs text-slate-500">${labelsData[3].s}</span>
-                            </div>
-                            <div class="tooltip tooltip-4 tooltip-up">
-                                <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[3].th}</span>
-                                ${labelsData[3].tt}
-                            </div>
-                            
-                            <div class="compass-label label-5">
-                                <span class="block font-bold">${labelsData[4].t}</span>
-                                <span class="font-normal text-xs text-slate-500">${labelsData[4].s}</span>
-                            </div>
-                            <div class="tooltip tooltip-5">
-                                <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[4].th}</span>
-                                ${labelsData[4].tt}
-                            </div>
-                            
-                            <div class="compass-label label-6">
-                                <span class="block font-bold">${labelsData[5].t}</span>
-                                <span class="font-normal text-xs text-slate-500">${labelsData[5].s}</span>
-                            </div>
-                            <div class="tooltip tooltip-6">
-                                <span class="block text-emerald-400 font-bold mb-1 uppercase text-[10px] tracking-wider">${labelsData[5].th}</span>
-                                ${labelsData[5].tt}
-                            </div>
-
-                            <div class="compass-center"></div>
+                                <div class="compass-center"></div>
                             <div class="compass-needle" id="needle"></div>
                         </div>
                     </div>
 
-                    <div class="mt-8 flex flex-col items-center gap-4 relative z-10">
+                    ${breakdownHtml}
+                    
+                    <!-- Text que només es mostra quan es descarrega la imatge -->
+                    <div id="export-footer" class="hidden mt-6 pt-4 text-sm font-medium text-slate-500 border-t border-slate-100">
+                        ${t('ui.exportFooter')}
+                    </div>
+                </div>
+
+                <div class="px-8 pb-8 pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 relative z-10 w-full">
+                        <button onclick="openTipsModal()" class="w-full sm:w-auto bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-3 px-6 rounded-full border border-amber-300 transition-colors shadow-sm flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                            ${t('ui.tipsBtn')}
+                        </button>
+                        <button onclick="downloadMap()" class="w-full sm:w-auto bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-3 px-6 rounded-full border border-indigo-300 transition-colors shadow-sm flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            ${t('ui.downloadBtn')}
+                        </button>
+                    </div>
+
+                    <div class="px-8 pb-8 flex flex-col items-center gap-4 relative z-10 border-t border-slate-100 pt-6">
                         <button onclick="resetForAnotherTerritory()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-full transition-all shadow-lg flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                             ${t('ui.exploreOther')}
@@ -1884,6 +2272,36 @@
                     </div>
                 </div>
             `;
+
+            // Dibuixem el fons de la brúixola en Canvas (així html2canvas ho podrà capturar sense problema)
+            const compassBg = document.getElementById('compassBg');
+            if (compassBg) {
+                const ctx = compassBg.getContext('2d');
+                const centerX = compassBg.width / 2;
+                const centerY = compassBg.height / 2;
+                const radius = compassBg.width / 2;
+                const colors = ['#fee2e2', '#ffedd5', '#fef9c3', '#ecfccb', '#dcfce7', '#d1fae5'];
+                
+                let startAngle = -Math.PI / 6; 
+                let sliceAngle = Math.PI / 3; 
+                
+                for(let i=0; i<6; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[i];
+                    ctx.fill();
+                    startAngle += sliceAngle;
+                }
+                
+                const radGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+                radGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
+                radGrad.addColorStop(0.55, 'rgba(255,255,255,0.3)');
+                radGrad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = radGrad;
+                ctx.fillRect(0, 0, compassBg.width, compassBg.height);
+            }
 
             setTimeout(() => {
                 const needle = document.getElementById('needle');
